@@ -15,16 +15,16 @@ public class Lager
 		unterlager = new ArrayList<Lager>();
 	}
 	
-	public Lager(String name, int kapazitaet, int bestand, Lager vaterlager)
+	public Lager(String name, int kapazitaet, int bestand)
 	{
 		this.name = name;
 		this.kapazitaet = kapazitaet;
 		this.bestand = bestand;
 		unterlager = new ArrayList<Lager>();
-		this.vaterlager = vaterlager;
+		this.vaterlager = null;
 	}
 
-	public Lager(String name, ArrayList<Lager> unterlager, Lager vaterlager)
+	public Lager(String name, ArrayList<Lager> unterlager)
 	{
 		this.name = name;
 		this.unterlager = unterlager;
@@ -33,7 +33,7 @@ public class Lager
 			kapazitaet += lager.getKapazitaet();
 			bestand += lager.getBestand();
 		}
-		this.vaterlager = vaterlager;
+		this.vaterlager = null;
 	}
 
 	public void addUnterlager(Lager lager) 

@@ -1,6 +1,7 @@
 package Controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import Model.Lager;
 
@@ -8,13 +9,13 @@ public class Lagerverwaltung
 {
 	private static ArrayList<Lager> lager;
 	
-	public static void main(String[] args)
+	public static void main(String[] args) throws IOException
 	{
 		lager = new ArrayList<Lager>();
 		
 		initTestlager();
 		
-		String datei = "C:\\Test\\test.csv";
+		String datei = "C:\\Test\\test.lager";
 		File file = new File(datei);
 		Dateiverwaltung.speicherZustand(file, lager);
 	}

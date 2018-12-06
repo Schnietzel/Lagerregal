@@ -1,5 +1,7 @@
 package lagerController;
 
+import java.io.File;
+
 public class Dateiverwaltung
 {
 	public void ladeZustand(File datei)

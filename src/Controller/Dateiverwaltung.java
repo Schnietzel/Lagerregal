@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import Model.Lager;
+import Model.Lieferung;
 
 public class Dateiverwaltung
 {	
@@ -20,7 +21,7 @@ public class Dateiverwaltung
 		oos.close();
 	}
 	
-	public ArrayList<Lager> ladeZustand(File datei) throws IOException, ClassNotFoundException
+	public static ArrayList<Lager> ladeZustand(File datei) throws IOException, ClassNotFoundException
 	{
 		//TODO: Lade-Dialog
 		FileInputStream fis = new FileInputStream(datei);
@@ -28,5 +29,24 @@ public class Dateiverwaltung
 		ArrayList<Lager> lager = (ArrayList<Lager>) ois.readObject();
 		ois.close();
 		return lager;
+	}
+	
+	public static void speicherHistorie(File datei, ArrayList<Lieferung> lieferungen) throws IOException
+	{
+		//TODO: Speicher-Dialog
+		FileOutputStream fos = new FileOutputStream(datei);
+		ObjectOutputStream oos = new ObjectOutputStream(fos);
+		oos.writeObject(lieferungen);
+		oos.close();
+	}
+	
+	public static ArrayList<Lieferung> ladeHistorie(File datei) throws IOException, ClassNotFoundException
+	{
+		//TODO: Lade-Dialog
+		FileInputStream fis = new FileInputStream(datei);
+		ObjectInputStream ois = new ObjectInputStream(fis);
+		ArrayList<Lieferung> lieferungen = (ArrayList<Lieferung>) ois.readObject();
+		ois.close();
+		return lieferungen;
 	}
 }

@@ -4,13 +4,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import Model.Lager;
+import Model.Lieferung;
 
 public class Lagerverwaltung
 {
 	private static ArrayList<Lager> lager;
+	private static ArrayList<Lieferung> lieferungen;
 	
-	public static void main(String[] args) throws IOException
+	public static void main(String[] args) throws IOException, ClassNotFoundException
 	{
+		onStartup();
+		
 		lager = new ArrayList<Lager>();
 		
 		initTestlager();
@@ -19,7 +23,43 @@ public class Lagerverwaltung
 		File file = new File(datei);
 		Dateiverwaltung.speicherZustand(file, lager);
 	}
+	
+	private static void onStartup() throws ClassNotFoundException, IOException
+	{
+		// TODO: Datei festlegen, Exceptions und so
+		String datei = "C:\\Test\\bla.historie";
+		File file = new File(datei);
+		lieferungen = Dateiverwaltung.ladeHistorie(file);
+	}
 
+	private static void onShutdown() throws IOException
+	{
+		// TODO: Datei festlegen, Exceptions und so
+		String datei = "C:\\Test\\bla.historie";
+		File file = new File(datei);
+		Dateiverwaltung.speicherHistorie(file, lieferungen);
+	}
+	
+	public static void changeName(Lager lager, String neuerName)
+	{
+		lager.setName(neuerName);
+	}
+	
+	public static ArrayList<Lager> getLagerList()
+	{
+		return lager;
+	}
+	
+	private static int getFreieGesamtlagerkapazität()
+	{
+		int kap = 0;
+		for (Lager l : lager)
+		{
+			kap += (l.getKapazitaet()-l.getBestand());
+		}
+		return kap;
+	}
+	
 	private static void initTestlager()
 	{
 		ArrayList<Lager> lNds = new ArrayList<Lager>();

@@ -1,13 +1,15 @@
 package Model;
 
+import java.util.ArrayList;
+
 public class LieferungFactory
 {
-	public Zulieferung CreateZulieferung(int menge)
+	public static Zulieferung CreateZulieferung(int menge)
 	{
 		return new Zulieferung(menge);
 	}
 	
-	public Auslieferung CreateAuslieferung(int menge)
+	public static Auslieferung CreateAuslieferung(int menge)
 	{
 		return new Auslieferung(menge);
 	}

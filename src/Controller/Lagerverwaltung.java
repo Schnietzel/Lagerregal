@@ -50,7 +50,7 @@ public class Lagerverwaltung
 		return lager;
 	}
 	
-	private static int getFreieGesamtlagerkapazität()
+	public static int getFreieGesamtlagerkapazität()
 	{
 		int kap = 0;
 		for (Lager l : lager)
@@ -58,6 +58,16 @@ public class Lagerverwaltung
 			kap += (l.getKapazitaet()-l.getBestand());
 		}
 		return kap;
+	}
+	
+	public static int getGesamtbestand()
+	{
+		int bestand = 0;
+		for (Lager l : lager)
+		{
+			bestand += (l.getBestand());
+		}
+		return bestand;
 	}
 	
 	private static void initTestlager()

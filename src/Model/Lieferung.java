@@ -13,8 +13,8 @@ public class Lieferung implements Serializable
 	public Lieferung(int gesamtmenge)
 	{
 		this.gesamtmenge = gesamtmenge;
+		this.buchungen = new ArrayList<Buchung>();
 		timestamp = new Date();
-		buchungen = new ArrayList<Buchung>();
 	}
 	
 	public void addBuchung(Buchung buchung)

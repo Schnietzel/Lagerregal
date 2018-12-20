@@ -81,7 +81,7 @@ public class Lager implements Serializable
 	@Override
 	public String toString()
 	{
-		return "Lager: " + name + ", Bestand: " + bestand + "/" + kapazitaet;
+		return name + ", Bestand: " + bestand + "/" + kapazitaet;
 	}
 	
 	public String getName() { return name; }

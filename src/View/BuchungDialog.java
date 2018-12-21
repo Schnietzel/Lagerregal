@@ -3,7 +3,12 @@ package View;
 import Controller.EingabeCheck;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class BuchungDialog extends JDialog{
     private JPanel contentPane;
@@ -35,14 +40,32 @@ public class BuchungDialog extends JDialog{
     }
 
     private void createListener() {
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-        slider.addChangeListener(e -> {
-            if (!supressSliderChange) {
-                input.setText(String.valueOf(slider.getValue()));
-            } else supressSliderChange = false;
-        });
-        input.addActionListener(e -> inputAction());
+        buttonOK.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onOK();
+			}
+		});
+        buttonCancel.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onCancel();
+			}
+		});
+        slider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+			    if (!supressSliderChange) {
+			        input.setText(String.valueOf(slider.getValue()));
+			    } else supressSliderChange = false;
+			}
+		});
+        input.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				inputAction();
+			}
+		});
     }
 
     public static void main(String[] args) {

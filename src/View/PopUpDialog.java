@@ -1,18 +1,16 @@
 package View;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class LieferungPopup extends JDialog {
+public class PopUpDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
-    private JTextArea infotext;
+    private JLabel infoText;
 
-    public LieferungPopup() {
+    PopUpDialog() {
+        this.setTitle("Fehler");
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(e -> onOK());
         try {
@@ -21,14 +19,23 @@ public class LieferungPopup extends JDialog {
         catch (UnsupportedLookAndFeelException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace ();
         }
-        infotext.setText("Ungültiger Wert, bitte geben sie nur Ganzzahlige Beträge zum Verteilen ein.");
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    }
+
+    public void popUp(){
         this.pack();
         this.setVisible(true);
-        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    }
+    public void setMeldung(String meldung){
+        infoText.setText(meldung);
     }
 
     private void onOK() {
         // add your code here
         this.dispose();
+    }
+
+    public static void main(String[] args){
+        PopUpDialog test = new PopUpDialog();
     }
 }

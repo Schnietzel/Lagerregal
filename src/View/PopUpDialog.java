@@ -1,5 +1,8 @@
 package View;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
@@ -14,7 +17,12 @@ public class PopUpDialog extends JDialog {
         setContentPane(contentPane);
         setModal(true);
 
-        buttonOK.addActionListener(e -> onOK());
+        buttonOK.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onOK();
+			}
+		});
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {

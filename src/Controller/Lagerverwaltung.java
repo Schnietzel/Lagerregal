@@ -11,28 +11,21 @@ public class Lagerverwaltung
 	private static ArrayList<Lager> lager = new ArrayList<Lager>();;
 	private static ArrayList<Lieferung> lieferungen;
 	
-	/*public static void main(String[] args) throws IOException, ClassNotFoundException
+	public static void initLagerverwaltung() throws ClassNotFoundException, IOException
 	{
-		//onStartup();
-		
 		lager = new ArrayList<Lager>();
 		
 		initTestlager();
-		
-		String datei = "C:\\Test\\test.lager";
-		File file = new File(datei);
-		Dateiverwaltung.speicherZustand(file, lager);
-		
-}*/
-	
-	private static void onStartup() throws ClassNotFoundException, IOException
+	}
+
+	private static void onStartup() throws IOException, ClassNotFoundException
 	{
 		// TODO: Datei festlegen, Exceptions und so
 		String datei = "C:\\Test\\bla.historie";
 		File file = new File(datei);
 		lieferungen = Dateiverwaltung.ladeHistorie(file);
 	}
-
+	
 	private static void onShutdown() throws IOException
 	{
 		// TODO: Datei festlegen, Exceptions und so

@@ -5,6 +5,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import Controller.*;
 import Model.Lager;
@@ -51,16 +53,34 @@ public class GUI extends JFrame {
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
 
+    private boolean lieferungAktiv = false;
 
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException 
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException 
     {
-    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    	Lagerverwaltung.initTestlager();
+    	Lagerverwaltung.initLagerverwaltung();
+    	Buchungsverwaltung.initBuchungsverwaltung();
     	
-        GUI test = new GUI();    
+    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    	
+    	GUI gui = new GUI();    
     }
 
     public GUI() {
+    	initGUI();
+    	
+    	this.setContentPane(outerpanel);
+        this.setTitle("LieferungsTool für Mertens v1337");
+        this.pack();
+      	this.setVisible(true);
+      	this.setMinimumSize(new Dimension(600, 500));
+      	this.validate();
+      	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        createListener();
+    }
+    
+    private void initGUI()
+    {
     	// TODO: GridLayout schön machen
     	outerpanel = new JPanel();
         outerpanel.setLayout(new GridLayout());
@@ -72,18 +92,31 @@ public class GUI extends JFrame {
         tabs = new JTabbedPane();
         innerpanel.add(tabs);
         
-        ansicht = new JPanel();
+        initGUIAnsicht();
+        initGUILieferung();
+        initGUIHistorie();
+        
+
+        // TODO: Spacer(?)
+//      final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
+//      Spacer
+//      toolbarPanel.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(14, 50), null, 0, false));
+//      final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
+//      outerpanel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, 1, null, null, null, 0, false));
+    }
+    
+    private void initGUIAnsicht()
+    {
+    	ansicht = new JPanel();
         ansicht.setLayout(new GridLayout());
         tabs.addTab("Lageransicht", ansicht);
         
         // TODO: Scrollpane
         // TestLager Anzeigen lassen
+        
         DefaultListModel<Lager> dlm = new DefaultListModel<>();
-        for(Lager l : Lagerverwaltung.getLagerList()) 
-        {
-        	// TODO: Rekursiv
-        	dlm.addElement(l);
-        }
+        getLagerRecursive(Lagerverwaltung.getLagerList(), dlm);
+        
         
         aList = new JList<Lager>(dlm);
         ansicht.add(aList);
@@ -108,8 +141,11 @@ public class GUI extends JFrame {
         aSpeichern = new JButton();
         aSpeichern.setText("Speichern");
         ansicht.add(aSpeichern);
-        
-        lieferung = new JPanel();
+    }
+    
+    private void initGUILieferung()
+    {
+    	lieferung = new JPanel();
         lieferung.setLayout(new GridLayout());
         tabs.addTab("Lieferung", lieferung);
         
@@ -166,39 +202,35 @@ public class GUI extends JFrame {
         toolbarPanel.add(redoButton);
         
         // TODO: ScrollPanel
-        lList = new JList();
-        // TODO: Liste füllen
-
-        historie = new JPanel();
+        DefaultListModel dlm = new DefaultListModel();
+        getLagerRecursive(Lagerverwaltung.getLagerList(), dlm);
+        lList = new JList<Lager>(dlm);
+        lieferung.add(lList);
+    }
+    
+    private void initGUIHistorie()
+    {
+    	historie = new JPanel();
         historie.setLayout(new GridLayout());
         tabs.addTab("Historie", historie);
         
         // TODO: Scrollpane
         hList = new JList();
         // TODO: Liste füllen
-        
-
-        // TODO: Spacer(?)
-//      final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
-//      Spacer
-//      toolbarPanel.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(14, 50), null, 0, false));
-//      final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
-//      outerpanel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, 1, null, null, null, 0, false));
-
-        
-        this.setContentPane(outerpanel);
-        this.setTitle("LieferungsTool für Mertens v1337");
-        this.pack();
-      	this.setVisible(true);
-      	this.setMinimumSize(new Dimension(600, 500));
-      	this.validate();
-      	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        createListener();
     }
-    
 
-    private void createListener() 
+    private void getLagerRecursive(ArrayList<Lager> lager, DefaultListModel<Lager> dlm)
+	{
+    	// TODO: Unterlager einrücken
+        for(Lager l : lager) 
+        {
+        	dlm.addElement(l);
+        	getLagerRecursive(l.getUnterlager(), dlm);
+        }
+		
+	}
+
+	private void createListener() 
     {
         // Undo
         undoButton.addActionListener(new ActionListener() {
@@ -213,26 +245,6 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: REDO
-            }
-        });
-        
-        // Lieferung verteilen
-        lieferungDist.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO: Daten an Ceddi übergeben, Lieferung werden nun verteilbar (Buchungen)
-                //Ceddis handling dann:
-                //Wenn Zahl: Methode lGueltigeZahl aufrufen
-                //Wenn keine Zahl: Methode lUngueltigeZahl Aufrufen.
-            }
-        });
-
-        // Lieferung Bestätigen
-        lieferungConfirm.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
-            	
             }
         });
 
@@ -258,10 +270,26 @@ public class GUI extends JFrame {
                 
                 selected.setName(aTbName.getText());
                 selected.setKapazitaet(Integer.parseInt(aTbKapazitaet.getText()));
+                
+                // TODO: Kapazitäten aller Lager aktualisieren (Observer?)
                 aList.updateUI();
             }
         });
+
         
+        // Lieferung verteilen
+        lieferungDist.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	// TODO: Exception Handling
+                int gesamtmenge = Integer.parseInt(lEingabeFeld.getText());
+                boolean gueltig = Buchungsverwaltung.createLieferung(rbAuslieferung.isSelected(), gesamtmenge);
+                if (gueltig) 
+                	lGueltigeLieferungsZahl();
+                else
+                	lUngueltigeZahl();
+            }
+        });
         
         // Lieferungen-Lager-Liste
         //Event: Doppelklick auf Item in der Liste, Item muss anschließend via Control bearbeitet werden.
@@ -269,11 +297,42 @@ public class GUI extends JFrame {
         lList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JList lList = (JList) e.getSource();
-                if (e.getClickCount() == 2) {
-                    int index = lList.locationToIndex(e.getPoint());
-                    listClick(index, 2);
+                if (e.getClickCount() == 2) 
+                {
+                	// TODO: Buchung Handlen
+                	Lager lager = (Lager) lList.getSelectedValue();
+                	if (Buchungsverwaltung.istBearbeitet(lager))
+                	{
+                		JOptionPane.showMessageDialog(null, "Lager ist bereits bearbeitet! (Ggf. Undo benutzen)");
+                		return;
+                	}
+                	if (!lager.getUnterlager().isEmpty())
+                	{
+                		JOptionPane.showMessageDialog(null, "Lager ist Oberlager und kann damit nicht zur Buchung verwendet werden!");
+                		return;
+                	}
+                	
+            		BuchungDialog bd = new BuchungDialog(lager);
+            		boolean gueltig = Buchungsverwaltung.createBuchung(rbAuslieferung.isSelected(), bd.getLager(), bd.getProzent());
+            		if (gueltig)
+            			lGueltigeBuchungsZahl();
+            		else
+            			lUngueltigeZahl();
+                	// TODO: Handlen ob Gültig oder nicht
                 }
+            }
+        });
+
+        // Lieferung Bestätigen
+        lieferungConfirm.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	//TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
+            	boolean gueltig = Buchungsverwaltung.verteileLieferung(rbAuslieferung.isSelected());
+            	if (gueltig)
+            		lGueltigeLieferung();
+            	else
+            		lUngueltigeLieferung();
             }
         });
         
@@ -284,7 +343,6 @@ public class GUI extends JFrame {
                 JList hList = (JList) e.getSource();
                 if (e.getClickCount() == 2) {
                     int index = hList.locationToIndex(e.getPoint());
-                    listClick(index, 3);
                 }
             }
         });
@@ -310,43 +368,39 @@ public class GUI extends JFrame {
 
     }
     
-    public void lGueltigeZahl() {
-        //müsste undo-able sein!!
-        lieferungDist.setEnabled(false);
-        lEingabeFeld.setEnabled(false);
-        lList.setEnabled(true);
-        rbEinlieferung.setEnabled(false);
-        rbAuslieferung.setEnabled(false);
-        lieferungConfirm.setEnabled(true);
+    public void lGueltigeLieferungsZahl() 
+    {
+    	setLieferungAktiv(true);    	
     }
 
+    public void lGueltigeBuchungsZahl()
+    {
+    	// TODO: Irgendwie in Liste bemerkbar machen
+    }
+    
+    public void lGueltigeLieferung()
+    {
+    	setLieferungAktiv(false);
+    }
+    
     public void lUngueltigeZahl() {
-        PopUpDialog popup = new PopUpDialog();
-        popup.setMeldung("Ungueltige Zahl.");
-        popup.popUp();
+        JOptionPane.showMessageDialog(null, "Lagermenge/Kapazität ist nicht ausreichend für diese Buchung");
     }
 
-    private void listClick(int index, int art) {
-        switch (art) {
-            case 1:
-                //TODO: Umbenennen des Lagers
-                break;
-            case 2:
-                //TODO: mit dem Index muss dann (nach klick auf OK) das angeklickte Lager gelocked werden?
-                BuchungDialog lBest = new BuchungDialog("GUI");
-                break;
-            case 3:
-                //TODO: Was auch immer beim Klicken in der Historie gemacht wird...
-                break;
-            default:
-                PopUpDialog popUp = new PopUpDialog();
-                popUp.setMeldung("Nicht unterstützte Liste, sollte eigentlich nicht vorkommen!");
-                popUp.setTitle("Mertens!!");
-                popUp.popUp();
-                break;
-        }
+    public void lUngueltigeLieferung()
+    {
+    	JOptionPane.showMessageDialog(null, "Es sind noch Artikel nicht verbucht!");
     }
-
+    
+    private void setLieferungAktiv(boolean aktiv)
+    {
+    	lieferungDist.setEnabled(!aktiv);
+        lEingabeFeld.setEnabled(!aktiv);
+        lList.setEnabled(aktiv);
+        rbEinlieferung.setEnabled(!aktiv);
+        rbAuslieferung.setEnabled(!aktiv);
+        lieferungConfirm.setEnabled(aktiv);
+    }
 
     /**
      * @noinspection ALL

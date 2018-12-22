@@ -8,7 +8,6 @@ public class Lager implements Serializable
 	private String name;
 	private int kapazitaet;
 	private int bestand;
-	private Lager vaterlager;
 	private ArrayList<Lager> unterlager;
 	
 	public Lager()
@@ -22,7 +21,7 @@ public class Lager implements Serializable
 		this.kapazitaet = kapazitaet;
 		this.bestand = bestand;
 		unterlager = new ArrayList<Lager>();
-		this.vaterlager = null;
+	
 	}
 
 	public Lager(String name, ArrayList<Lager> unterlager)
@@ -34,7 +33,7 @@ public class Lager implements Serializable
 			kapazitaet += lager.getKapazitaet();
 			bestand += lager.getBestand();
 		}
-		this.vaterlager = null;
+	
 	}
 
 	public void addUnterlager(Lager lager) 
@@ -88,5 +87,5 @@ public class Lager implements Serializable
 	public void setName(String name) { this.name = name; }
 	public int getKapazitaet() { return kapazitaet; }
 	public int getBestand() { return bestand; }
-	public Lager getVaterlager() { return vaterlager; }
+	
 }

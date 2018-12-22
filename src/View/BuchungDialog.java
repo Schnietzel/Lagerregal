@@ -71,10 +71,10 @@ public class BuchungDialog extends JDialog {
         });
     }
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         //mein Test
         BuchungDialog dialog = new BuchungDialog("000/1000 verteilt.");
-    }
+    }*/
 
     private void onOK() {
         //TODO: Wert an Control übergeben, Lager "disablen"

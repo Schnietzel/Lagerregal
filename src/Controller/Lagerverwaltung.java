@@ -8,12 +8,12 @@ import Model.Lieferung;
 
 public class Lagerverwaltung
 {
-	private static ArrayList<Lager> lager;
+	private static ArrayList<Lager> lager = new ArrayList<Lager>();;
 	private static ArrayList<Lieferung> lieferungen;
 	
-	public static void main(String[] args) throws IOException, ClassNotFoundException
+	/*public static void main(String[] args) throws IOException, ClassNotFoundException
 	{
-		onStartup();
+		//onStartup();
 		
 		lager = new ArrayList<Lager>();
 		
@@ -22,7 +22,8 @@ public class Lagerverwaltung
 		String datei = "C:\\Test\\test.lager";
 		File file = new File(datei);
 		Dateiverwaltung.speicherZustand(file, lager);
-	}
+		
+}*/
 	
 	private static void onStartup() throws ClassNotFoundException, IOException
 	{
@@ -70,7 +71,7 @@ public class Lagerverwaltung
 		return bestand;
 	}
 	
-	private static void initTestlager()
+	public static void initTestlager()
 	{
 		ArrayList<Lager> lNds = new ArrayList<Lager>();
 		ArrayList<Lager> lDeutschland = new ArrayList<Lager>();

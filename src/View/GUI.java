@@ -6,33 +6,45 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ResourceBundle;
+import Controller.*;
+import Model.Lager;
 
 import static javax.swing.UIManager.*;
 
 public class GUI extends JFrame {
-    private JPanel outerpanel;
-    private JTabbedPane tabs;
+	private Lagerverwaltung lagerverwaltung;
+	
+    private JPanel outerpanel; 
     private JButton undoButton;
     private JButton redoButton;
-    private JList hList;
     private JPanel innerpanel;
+    private JTabbedPane tabs;
+   
+    // 
+    private JPanel ansicht;
+    private JList aList;
+    
+    private JScrollPane aScrollPane;
+    
+    private JPanel lieferung; 
     private JPanel lEingabePanel;
     private JPanel lAnsichtPanel;
-    private JList lList;
+    private JList lList; 
     private JScrollPane lScrollPane;
-    private JScrollPane hScrollPane;
-    private JButton lieferungDist;
     private JTextField lEingabeFeld;
-    private JList aList;
-    private JScrollPane aScrollPane;
-    private JPanel ansicht;
-    private JPanel lieferung;
-    private JPanel historie;
+    private JButton lieferungDist;
     private JButton lieferungConfirm;
+    private JLabel lLabel;
+     
+    private JPanel historie;
+    private JList hList;  
+    private JScrollPane hScrollPane;
+    
+   
     private JPanel toolbarPanel;
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
-    private JLabel lLabel;
+    
 
     public GUI() {
         this.setContentPane(outerpanel);
@@ -47,13 +59,24 @@ public class GUI extends JFrame {
             setLookAndFeel(getSystemLookAndFeelClassName());
         } catch (UnsupportedLookAndFeelException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
+        } 
+        //TestLager Anzeigen lassen
+        DefaultListModel<Lager> dlm = new DefaultListModel<>();
+        Lagerverwaltung.initTestlager();
+        for(Lager l : Lagerverwaltung.getLagerList()) {
+        	dlm.addElement(l);
         }
+        aList = new JList<Lager>(dlm);
+        aScrollPane.add(aList);
+     
         this.pack();
         this.setVisible(true);
         this.setMinimumSize(new Dimension(600, 500));
         this.validate();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         createListener();
+     
+        
     }
 
     private void createListener() {
@@ -76,6 +99,7 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
+            	
             }
         });
         lieferungDist.addActionListener(new ActionListener() {
@@ -135,7 +159,10 @@ public class GUI extends JFrame {
 
     public static void main(String[] args) {
         GUI test = new GUI();
+        
+        
     }
+    
 
     public void lTextEdit(String lieferung) {
         lLabel.setText(lieferung + ": " + "Zahl" + "/" + "Zahl" + " verteilt.");

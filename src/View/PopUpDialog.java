@@ -24,11 +24,6 @@ public class PopUpDialog extends JDialog {
                 onOK();
             }
         });
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 

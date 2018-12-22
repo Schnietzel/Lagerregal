@@ -15,15 +15,20 @@ public class GUI extends JFrame {
 	private Lagerverwaltung lagerverwaltung;
 	
     private JPanel outerpanel; 
-    private JButton undoButton;
-    private JButton redoButton;
     private JPanel innerpanel;
+    
+    
     private JTabbedPane tabs;
    
     private JPanel ansicht;
     private JList aList;
-    
     private JScrollPane aScrollPane;
+    private JPanel ansichtPanel;
+    private JLabel aName;
+    private JLabel aKapazitaet;
+    private JTextField aTbName;
+    private JTextField aTbKapazitaet;
+    private JButton aSpeichern;
     
     private JPanel lieferung; 
     private JPanel lEingabePanel;
@@ -34,6 +39,8 @@ public class GUI extends JFrame {
     private JButton lieferungDist;
     private JButton lieferungConfirm;
     private JLabel lLabel;
+    private JButton undoButton;
+    private JButton redoButton;
      
     private JPanel historie;
     private JList hList;  
@@ -81,7 +88,27 @@ public class GUI extends JFrame {
         aList = new JList<Lager>(dlm);
         ansicht.add(aList);
         
+        ansichtPanel = new JPanel();
+        ansicht.add(ansichtPanel);
 
+        aName = new JLabel();
+        aName.setText("Name:");
+        ansicht.add(aName);
+        
+        aTbName = new JTextField();
+        ansicht.add(aTbName);
+        
+        aKapazitaet = new JLabel();
+        aKapazitaet.setText("Kapazität:");
+        ansicht.add(aKapazitaet);
+        
+        aTbKapazitaet = new JTextField();
+        ansicht.add(aTbKapazitaet);
+        
+        aSpeichern = new JButton();
+        aSpeichern.setText("Speichern");
+        ansicht.add(aSpeichern);
+        
         lieferung = new JPanel();
         lieferung.setLayout(new GridLayout());
         tabs.addTab("Lieferung", lieferung);
@@ -125,7 +152,19 @@ public class GUI extends JFrame {
         lAnsichtPanel = new JPanel();
         lAnsichtPanel.setLayout(new GridLayout());
         lieferung.add(lAnsichtPanel);
-      
+
+        toolbarPanel = new JPanel();
+        toolbarPanel.setLayout(new GridLayout());
+        lieferung.add(toolbarPanel);
+
+        undoButton = new JButton();
+        undoButton.setText("Undo");
+        toolbarPanel.add(undoButton);
+
+        redoButton = new JButton();
+        redoButton.setText("Redo");
+        toolbarPanel.add(redoButton);
+        
         // TODO: ScrollPanel
         lList = new JList();
         // TODO: Liste füllen
@@ -138,21 +177,10 @@ public class GUI extends JFrame {
         hList = new JList();
         // TODO: Liste füllen
         
-        toolbarPanel = new JPanel();
-        toolbarPanel.setLayout(new GridLayout());
-        outerpanel.add(toolbarPanel);
-
-        undoButton = new JButton();
-        undoButton.setText("Undo");
-        toolbarPanel.add(undoButton);
-
-        redoButton = new JButton();
-        redoButton.setText("Redo");
-        toolbarPanel.add(redoButton);
 
         // TODO: Spacer(?)
-//        final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
-//        Spacer
+//      final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
+//      Spacer
 //      toolbarPanel.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(14, 50), null, 0, false));
 //      final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
 //      outerpanel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, 1, null, null, null, 0, false));
@@ -167,91 +195,109 @@ public class GUI extends JFrame {
       	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         createListener();
-      	
-
-   
-        
-        
     }
     
 
-    private void createListener() {
-//        //UNDO REDO
-//        undoButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                //UNDO
-//            }
-//        });
-//        redoButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                //REDO
-//            }
-//        });
-//
-//        //BUTTONS
-//        lieferungConfirm.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
-//            	
-//            }
-//        });
-//        lieferungDist.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                //TODO: Daten an Ceddi übergeben, Lieferung werden nun verteilbar (Buchungen)
-//                //Ceddis handling dann:
-//                //Wenn Zahl: Methode lGueltigeZahl aufrufen
-//                //Wenn keine Zahl: Methode lUngueltigeZahl Aufrufen.
-//            }
-//        });
+    private void createListener() 
+    {
+        // Undo
+        undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO: UNDO
+            }
+        });
+        
+        // Redo
+        redoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO: REDO
+            }
+        });
+        
+        // Lieferung verteilen
+        lieferungDist.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO: Daten an Ceddi übergeben, Lieferung werden nun verteilbar (Buchungen)
+                //Ceddis handling dann:
+                //Wenn Zahl: Methode lGueltigeZahl aufrufen
+                //Wenn keine Zahl: Methode lUngueltigeZahl Aufrufen.
+            }
+        });
 
-        //LISTEN::::
+        // Lieferung Bestätigen
+        lieferungConfirm.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
+            	
+            }
+        });
+
+        // Lager-Ansicht
         aList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-//                JList aList = (JList) e.getSource();
-//                if (e.getClickCount() == 2) {
-//                    int index = aList.locationToIndex(e.getPoint());
-//                    listClick(index, 1);
-//                }
-            	JOptionPane.showMessageDialog(null, "Test");
+                Lager selected = (Lager) aList.getSelectedValue();
+                
+                aTbName.setText(selected.getName());
+                aTbKapazitaet.setText("" + selected.getKapazitaet());
+                
+                aTbKapazitaet.setEnabled(selected.getUnterlager().isEmpty());
+                
             }
         });
+        
+        // Lager-Änderung speichern
+        aSpeichern.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	Lager selected = (Lager) aList.getSelectedValue();
+                
+                selected.setName(aTbName.getText());
+                selected.setKapazitaet(Integer.parseInt(aTbKapazitaet.getText()));
+                aList.updateUI();
+            }
+        });
+        
+        
+        // Lieferungen-Lager-Liste
         //Event: Doppelklick auf Item in der Liste, Item muss anschließend via Control bearbeitet werden.
-//        // Aufruf in der LierferungBestätigen
-//        lList.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                JList lList = (JList) e.getSource();
-//                if (e.getClickCount() == 2) {
-//                    int index = lList.locationToIndex(e.getPoint());
-//                    listClick(index, 2);
-//                }
-//            }
-//        });
-//        hList.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                JList hList = (JList) e.getSource();
-//                if (e.getClickCount() == 2) {
-//                    int index = hList.locationToIndex(e.getPoint());
-//                    listClick(index, 3);
-//                }
-//            }
-//        });
-//
-//        //RADIOBUTTONS
-//        rbEinlieferung.addChangeListener(new ChangeListener() {
-//            @Override
-//            public void stateChanged(ChangeEvent e) {
-//                if (rbEinlieferung.isSelected()) {
-//                    lTextEdit("Einlieferung");
-//                } else lTextEdit("Auslieferung");
-//            }
-//        });
+        // Aufruf in der LierferungBestätigen
+        lList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JList lList = (JList) e.getSource();
+                if (e.getClickCount() == 2) {
+                    int index = lList.locationToIndex(e.getPoint());
+                    listClick(index, 2);
+                }
+            }
+        });
+        
+        // Historien-Liste
+        hList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JList hList = (JList) e.getSource();
+                if (e.getClickCount() == 2) {
+                    int index = hList.locationToIndex(e.getPoint());
+                    listClick(index, 3);
+                }
+            }
+        });
+
+        // RadioButtons
+        rbEinlieferung.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (rbEinlieferung.isSelected()) {
+                    lTextEdit("Einlieferung");
+                } else lTextEdit("Auslieferung");
+            }
+        });
     }
     
 
@@ -263,7 +309,7 @@ public class GUI extends JFrame {
         //Auslieferung: xxxx/xxxx verteilt.
 
     }
-
+    
     public void lGueltigeZahl() {
         //müsste undo-able sein!!
         lieferungDist.setEnabled(false);

@@ -25,11 +25,6 @@ public class BuchungDialog extends JDialog {
         setContentPane(contentPane);
         this.setTitle("Buchung durchführen");
         this.infoText.setText(info);
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         this.pack();
         this.setVisible(true);
         this.setMinimumSize(new Dimension(450, 200));
@@ -67,11 +62,6 @@ public class BuchungDialog extends JDialog {
             }
         });
     }
-
-   /* public static void main(String[] args) {
-        //mein Test
-        BuchungDialog dialog = new BuchungDialog("000/1000 verteilt.");
-    }*/
 
     private void onOK() {
         //TODO: Wert an Control übergeben, Lager "disablen"

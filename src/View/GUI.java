@@ -1,6 +1,7 @@
 package View;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
@@ -8,8 +9,11 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.Flow;
+
 import Controller.*;
 import Model.Lager;
+import Model.Lieferung;
 
 import static javax.swing.UIManager.*;
 
@@ -21,53 +25,56 @@ public class GUI extends JFrame {
     
     
     private JTabbedPane tabs;
-   
+
+    //AnsichtTab
     private JPanel ansicht;
-    private JList aList;
+    //Tabellenkram
+    private JPanel aListePanel;
     private JScrollPane aScrollPane;
-    private JPanel ansichtPanel;
+    private JList aList;
+    //Bearbeitungszeile
+    private JPanel aBearbPanel;
     private JLabel aName;
-    private JLabel aKapazitaet;
     private JTextField aTbName;
+    private JLabel aKapazitaet;
     private JTextField aTbKapazitaet;
     private JButton aSpeichern;
-    
-    private JPanel lieferung; 
+
+    //LieferungTab
+    private JPanel lieferung;
+    //EingabePanel
     private JPanel lEingabePanel;
-    private JPanel lAnsichtPanel;
-    private JList lList; 
-    private JScrollPane lScrollPane;
     private JTextField lEingabeFeld;
-    private JButton lieferungDist;
-    private JButton lieferungConfirm;
     private JLabel lLabel;
-    private JButton undoButton;
-    private JButton redoButton;
-     
-    private JPanel historie;
-    private JList hList;  
-    private JScrollPane hScrollPane;
-    
-   
-    private JPanel toolbarPanel;
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
+    private JButton lieferungDist;
+    private JButton lieferungConfirm;
+    private JPanel lListePanel;
+    private JScrollPane lScrollPane;
+    private JList lList;
+    private JButton undoButton;
+    private JButton redoButton;
+
+    private JPanel historie;
+    private JScrollPane hScrollPane;
+    private JList hList;
 
     private boolean lieferungAktiv = false;
 
-    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException 
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException
     {
     	Lagerverwaltung.initLagerverwaltung();
     	Buchungsverwaltung.initBuchungsverwaltung();
-    	
+
     	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    	
-    	GUI gui = new GUI();    
+
+    	GUI gui = new GUI();
     }
 
     public GUI() {
     	initGUI();
-    	
+
     	this.setContentPane(outerpanel);
         this.setTitle("LieferungsTool für Mertens v1337");
         this.pack();
@@ -78,24 +85,25 @@ public class GUI extends JFrame {
 
         createListener();
     }
-    
+
     private void initGUI()
     {
     	// TODO: GridLayout schön machen
     	outerpanel = new JPanel();
         outerpanel.setLayout(new GridLayout());
-        
+
         innerpanel = new JPanel();
         innerpanel.setLayout(new GridLayout());
         outerpanel.add(innerpanel);
-        
+
         tabs = new JTabbedPane();
         innerpanel.add(tabs);
-        
+
         initGUIAnsicht();
         initGUILieferung();
         initGUIHistorie();
-        
+        this.setPreferredSize(new Dimension(450,500));
+
 
         // TODO: Spacer(?)
 //      final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
@@ -104,49 +112,63 @@ public class GUI extends JFrame {
 //      final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
 //      outerpanel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, 1, null, null, null, 0, false));
     }
-    
+
     private void initGUIAnsicht()
     {
     	ansicht = new JPanel();
-        ansicht.setLayout(new GridLayout());
+    	ansicht.setLayout(new BoxLayout(ansicht, BoxLayout.Y_AXIS));
         tabs.addTab("Lageransicht", ansicht);
-        
-        // TODO: Scrollpane
+
+        //Panel für die Liste erstellen
+        aListePanel = new JPanel(new BorderLayout());
         // TestLager Anzeigen lassen
-        
         DefaultListModel<Lager> dlm = new DefaultListModel<>();
         getLagerRecursive(Lagerverwaltung.getLagerList(), dlm);
-        
-        
+        //Liste an JList
         aList = new JList<Lager>(dlm);
-        ansicht.add(aList);
-        
-        ansichtPanel = new JPanel();
-        ansicht.add(ansichtPanel);
+        aList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //JList an Scrollpane
+        aScrollPane = new JScrollPane(aList);
+        //ScrollPane an Panel für Liste
+        aListePanel.add(aScrollPane);
+
+        //Panel für Bearbeitungsleiste erstellen
+        aBearbPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         aName = new JLabel();
         aName.setText("Name:");
-        ansicht.add(aName);
-        
+        aBearbPanel.add(aName);
+
         aTbName = new JTextField();
-        ansicht.add(aTbName);
-        
+        //Initiales Disablen
+        aTbName.setEnabled(false);
+        aTbName.setPreferredSize(new Dimension(120,19));
+        aBearbPanel.add(aTbName);
+
         aKapazitaet = new JLabel();
         aKapazitaet.setText("Kapazität:");
-        ansicht.add(aKapazitaet);
-        
+        aBearbPanel.add(aKapazitaet);
+
         aTbKapazitaet = new JTextField();
-        ansicht.add(aTbKapazitaet);
-        
+        //Initiales Disablen
+        aTbKapazitaet.setEnabled(false);
+        aTbKapazitaet.setPreferredSize(new Dimension(60,19));
+        aBearbPanel.add(aTbKapazitaet);
+
         aSpeichern = new JButton();
+        //Initiales Disablen
+        aSpeichern.setEnabled(false);
         aSpeichern.setText("Speichern");
-        ansicht.add(aSpeichern);
+        aBearbPanel.add(aSpeichern);
+        //Panels in Ansicht
+        ansicht.add(aListePanel);
+        ansicht.add(aBearbPanel);
     }
     
     private void initGUILieferung()
     {
     	lieferung = new JPanel();
-        lieferung.setLayout(new GridLayout());
+    	lieferung.setLayout(new BoxLayout(lieferung, BoxLayout.Y_AXIS));
         tabs.addTab("Lieferung", lieferung);
         
         lEingabePanel = new JPanel();
@@ -154,69 +176,100 @@ public class GUI extends JFrame {
         lieferung.add(lEingabePanel);
 
         lEingabeFeld = new JTextField();
+        lEingabeFeld.setToolTipText("Bitte Menge eintragen.");
+        lEingabeFeld.setPreferredSize(new Dimension(100, 19));
         lEingabePanel.add(lEingabeFeld);
-        
-        // TODO: LoadButtonText Ändern
-        lieferungDist = new JButton();
-        this.$$$loadButtonText$$$(lieferungDist, ResourceBundle.getBundle("String").getString("lieferung.verteilen"));
-        lEingabePanel.add(lieferungDist);
 
-        ButtonGroup radioButtons = new ButtonGroup();
-        
+        //Panel für die Radiobuttons, damit sie untereinander sind
+        JPanel lRBPanel = new JPanel();
+        lRBPanel.setLayout(new BoxLayout(lRBPanel, BoxLayout.Y_AXIS));
+
         rbEinlieferung = new JRadioButton();
-        this.$$$loadButtonText$$$(rbEinlieferung, ResourceBundle.getBundle("String").getString("einlieferung"));
-        lEingabePanel.add(rbEinlieferung);
-        radioButtons.add(rbEinlieferung);
+        rbEinlieferung.setText("Einlieferung");
+        lRBPanel.add(rbEinlieferung);
 
         rbAuslieferung = new JRadioButton();
-        this.$$$loadButtonText$$$(rbAuslieferung, ResourceBundle.getBundle("String").getString("auslieferung"));
-        lEingabePanel.add(rbAuslieferung);
+        rbAuslieferung.setText("Auslieferung");
+        lRBPanel.add(rbAuslieferung);
+
+        lEingabePanel.add(lRBPanel);
+        //RadioButtons zur Gruppe hinzufügen
+        ButtonGroup radioButtons = new ButtonGroup();
+        radioButtons.add(rbEinlieferung);
         radioButtons.add(rbAuslieferung);
-        
         // Standard: Einlieferung
         rbEinlieferung.setSelected(true);
-        
+
+        JPanel lButtonPanel = new JPanel();
+        lButtonPanel.setLayout(new BoxLayout(lButtonPanel, BoxLayout.Y_AXIS));
+
+        lieferungDist = new JButton();
+        lieferungDist.setText("Lieferung verteilen");
+        //lieferungDist.setPreferredSize(new Dimension(200,30));
+        lButtonPanel.add(lieferungDist);
+
         lieferungConfirm = new JButton();
-        this.$$$loadButtonText$$$(lieferungConfirm, ResourceBundle.getBundle("String").getString("lieferung.bestatigen"));
-        lEingabePanel.add(lieferungConfirm);
+        lieferungConfirm.setText("Lieferung bestätigen");
+        //lieferungConfirm.setPreferredSize(new Dimension(150,30));
         lieferungConfirm.setEnabled(false);
+        lButtonPanel.add(lieferungConfirm);
+
+        lEingabePanel.add(lButtonPanel);
+
+        //Panel für die Liste erstellen
+        lListePanel = new JPanel(new BorderLayout());
+        //Liste füllen
+        DefaultListModel dlm = new DefaultListModel();
+        getLagerRecursive(Lagerverwaltung.getLagerList(), dlm);
+
+        //Liste an JList
+        lList = new JList<Lager>(dlm);
+        lList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //JList an Scrollpane
+        lScrollPane = new JScrollPane(lList);
+        //ScrollPane an Panel für Liste
+        lListePanel.add(lScrollPane);
+        
+        //Panel für die Bearbeitungsleiste,
+        JPanel lBearbPanelMain = new JPanel(new GridLayout());
+        JPanel lBearbPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JPanel lBearbPanelRight = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
         lLabel = new JLabel();
         lLabel.setText("0/0 verteilt.");
-        lEingabePanel.add(lLabel);
-
-        lAnsichtPanel = new JPanel();
-        lAnsichtPanel.setLayout(new GridLayout());
-        lieferung.add(lAnsichtPanel);
-
-        toolbarPanel = new JPanel();
-        toolbarPanel.setLayout(new GridLayout());
-        lieferung.add(toolbarPanel);
+        lBearbPanelLeft.add(lLabel);
 
         undoButton = new JButton();
         undoButton.setText("Undo");
-        toolbarPanel.add(undoButton);
+        lBearbPanelRight.add(undoButton);
 
         redoButton = new JButton();
         redoButton.setText("Redo");
-        toolbarPanel.add(redoButton);
-        
-        // TODO: ScrollPanel
-        DefaultListModel dlm = new DefaultListModel();
-        getLagerRecursive(Lagerverwaltung.getLagerList(), dlm);
-        lList = new JList<Lager>(dlm);
-        lieferung.add(lList);
+        lBearbPanelRight.add(redoButton);
+
+        lBearbPanelMain.add(lBearbPanelLeft);
+        lBearbPanelMain.add(lBearbPanelRight);
+
+        lieferung.add(lEingabePanel);
+        lieferung.add(lListePanel);
+        lieferung.add(lBearbPanelMain);
     }
     
     private void initGUIHistorie()
     {
-    	historie = new JPanel();
-        historie.setLayout(new GridLayout());
+    	historie = new JPanel(new BorderLayout());
         tabs.addTab("Historie", historie);
-        
-        // TODO: Scrollpane
+
         hList = new JList();
         // TODO: Liste füllen
+
+        //Liste an JList
+        //hList = new JList<a>(b);
+        hList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //JList an Scrollpane
+        hScrollPane = new JScrollPane(hList);
+        //ScrollPane an Panel für Liste
+        historie.add(hScrollPane);
     }
 
     private void getLagerRecursive(ArrayList<Lager> lager, DefaultListModel<Lager> dlm)
@@ -248,10 +301,14 @@ public class GUI extends JFrame {
             }
         });
 
-        // Lager-Ansicht
+        //TODO: Lager-Ansicht: Problem, klick mal was an und halt maustaste gedrückt, dann auf ein anderes ziehen
+        //- erster klick wird nur genommen...
         aList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                //Disabled bis das erste Lager ausgwählt wurde
+                aTbName.setEnabled(true);
+                aSpeichern.setEnabled(true);
                 Lager selected = (Lager) aList.getSelectedValue();
                 
                 aTbName.setText(selected.getName());

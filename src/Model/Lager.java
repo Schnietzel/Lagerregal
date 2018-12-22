@@ -87,5 +87,15 @@ public class Lager implements Serializable
 	public void setName(String name) { this.name = name; }
 	public int getKapazitaet() { return kapazitaet; }
 	public int getBestand() { return bestand; }
+
+	public ArrayList<Lager> getUnterlager()
+	{
+		return unterlager;
+	}
+
+	public void setKapazitaet(int kap)
+	{
+		this.kapazitaet = kap;
+	}
 	
 }

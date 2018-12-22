@@ -4,6 +4,5 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/material-ui-swing"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/forms_rt"/>
-	<classpathentry kind="lib" path="C:/Users/nicol/git/Lagerregal/forms_rt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

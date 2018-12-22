@@ -20,7 +20,6 @@ public class GUI extends JFrame {
     private JPanel innerpanel;
     private JTabbedPane tabs;
    
-    // 
     private JPanel ansicht;
     private JList aList;
     
@@ -44,123 +43,215 @@ public class GUI extends JFrame {
     private JPanel toolbarPanel;
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
-    
 
-    public GUI() {
-        this.setContentPane(outerpanel);
-        this.setTitle("LieferungsTool für Mertens v1337");
-        ButtonGroup radioButtons = new ButtonGroup();
-        radioButtons.add(rbAuslieferung);
-        radioButtons.add(rbEinlieferung);
-        //Standard: Einlieferung
-        rbEinlieferung.setSelected(true);
-        lieferungConfirm.setEnabled(false);
-        try {
-            setLookAndFeel(getSystemLookAndFeelClassName());
-        } catch (UnsupportedLookAndFeelException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        } 
-        //TestLager Anzeigen lassen
-        DefaultListModel<Lager> dlm = new DefaultListModel<>();
-        Lagerverwaltung.initTestlager();
-        for(Lager l : Lagerverwaltung.getLagerList()) {
-        	dlm.addElement(l);
-        }
-        aList = new JList<Lager>(dlm);
-        aScrollPane.add(aList);
-     
-        this.pack();
-        this.setVisible(true);
-        this.setMinimumSize(new Dimension(600, 500));
-        this.validate();
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        createListener();
-     
-        
+
+    public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException 
+    {
+    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    	Lagerverwaltung.initTestlager();
+    	
+        GUI test = new GUI();    
     }
 
-    private void createListener() {
-        //UNDO REDO
-        undoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //UNDO
-            }
-        });
-        redoButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //REDO
-            }
-        });
+    public GUI() {
+    	// TODO: GridLayout schön machen
+    	outerpanel = new JPanel();
+        outerpanel.setLayout(new GridLayout());
+        
+        innerpanel = new JPanel();
+        innerpanel.setLayout(new GridLayout());
+        outerpanel.add(innerpanel);
+        
+        tabs = new JTabbedPane();
+        innerpanel.add(tabs);
+        
+        ansicht = new JPanel();
+        ansicht.setLayout(new GridLayout());
+        tabs.addTab("Lageransicht", ansicht);
+        
+        // TODO: Scrollpane
+        // TestLager Anzeigen lassen
+        DefaultListModel<Lager> dlm = new DefaultListModel<>();
+        for(Lager l : Lagerverwaltung.getLagerList()) 
+        {
+        	// TODO: Rekursiv
+        	dlm.addElement(l);
+        }
+        
+        aList = new JList<Lager>(dlm);
+        ansicht.add(aList);
+        
 
-        //BUTTONS
-        lieferungConfirm.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
-            	
-            }
-        });
-        lieferungDist.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO: Daten an Ceddi übergeben, Lieferung werden nun verteilbar (Buchungen)
-                //Ceddis handling dann:
-                //Wenn Zahl: Methode lGueltigeZahl aufrufen
-                //Wenn keine Zahl: Methode lUngueltigeZahl Aufrufen.
-            }
-        });
+        lieferung = new JPanel();
+        lieferung.setLayout(new GridLayout());
+        tabs.addTab("Lieferung", lieferung);
+        
+        lEingabePanel = new JPanel();
+        lEingabePanel.setLayout(new GridLayout());
+        lieferung.add(lEingabePanel);
+
+        lEingabeFeld = new JTextField();
+        lEingabePanel.add(lEingabeFeld);
+        
+        // TODO: LoadButtonText Ändern
+        lieferungDist = new JButton();
+        this.$$$loadButtonText$$$(lieferungDist, ResourceBundle.getBundle("String").getString("lieferung.verteilen"));
+        lEingabePanel.add(lieferungDist);
+
+        ButtonGroup radioButtons = new ButtonGroup();
+        
+        rbEinlieferung = new JRadioButton();
+        this.$$$loadButtonText$$$(rbEinlieferung, ResourceBundle.getBundle("String").getString("einlieferung"));
+        lEingabePanel.add(rbEinlieferung);
+        radioButtons.add(rbEinlieferung);
+
+        rbAuslieferung = new JRadioButton();
+        this.$$$loadButtonText$$$(rbAuslieferung, ResourceBundle.getBundle("String").getString("auslieferung"));
+        lEingabePanel.add(rbAuslieferung);
+        radioButtons.add(rbAuslieferung);
+        
+        // Standard: Einlieferung
+        rbEinlieferung.setSelected(true);
+        
+        lieferungConfirm = new JButton();
+        this.$$$loadButtonText$$$(lieferungConfirm, ResourceBundle.getBundle("String").getString("lieferung.bestatigen"));
+        lEingabePanel.add(lieferungConfirm);
+        lieferungConfirm.setEnabled(false);
+
+        lLabel = new JLabel();
+        lLabel.setText("0/0 verteilt.");
+        lEingabePanel.add(lLabel);
+
+        lAnsichtPanel = new JPanel();
+        lAnsichtPanel.setLayout(new GridLayout());
+        lieferung.add(lAnsichtPanel);
+      
+        // TODO: ScrollPanel
+        lList = new JList();
+        // TODO: Liste füllen
+
+        historie = new JPanel();
+        historie.setLayout(new GridLayout());
+        tabs.addTab("Historie", historie);
+        
+        // TODO: Scrollpane
+        hList = new JList();
+        // TODO: Liste füllen
+        
+        toolbarPanel = new JPanel();
+        toolbarPanel.setLayout(new GridLayout());
+        outerpanel.add(toolbarPanel);
+
+        undoButton = new JButton();
+        undoButton.setText("Undo");
+        toolbarPanel.add(undoButton);
+
+        redoButton = new JButton();
+        redoButton.setText("Redo");
+        toolbarPanel.add(redoButton);
+
+        // TODO: Spacer(?)
+//        final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
+//        Spacer
+//      toolbarPanel.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(14, 50), null, 0, false));
+//      final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
+//      outerpanel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, 1, null, null, null, 0, false));
+
+        
+        this.setContentPane(outerpanel);
+        this.setTitle("LieferungsTool für Mertens v1337");
+        this.pack();
+      	this.setVisible(true);
+      	this.setMinimumSize(new Dimension(600, 500));
+      	this.validate();
+      	this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        createListener();
+      	
+
+   
+        
+        
+    }
+    
+
+    private void createListener() {
+//        //UNDO REDO
+//        undoButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                //UNDO
+//            }
+//        });
+//        redoButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                //REDO
+//            }
+//        });
+//
+//        //BUTTONS
+//        lieferungConfirm.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
+//            	
+//            }
+//        });
+//        lieferungDist.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                //TODO: Daten an Ceddi übergeben, Lieferung werden nun verteilbar (Buchungen)
+//                //Ceddis handling dann:
+//                //Wenn Zahl: Methode lGueltigeZahl aufrufen
+//                //Wenn keine Zahl: Methode lUngueltigeZahl Aufrufen.
+//            }
+//        });
 
         //LISTEN::::
         aList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JList aList = (JList) e.getSource();
-                if (e.getClickCount() == 2) {
-                    int index = aList.locationToIndex(e.getPoint());
-                    listClick(index, 1);
-                }
+//                JList aList = (JList) e.getSource();
+//                if (e.getClickCount() == 2) {
+//                    int index = aList.locationToIndex(e.getPoint());
+//                    listClick(index, 1);
+//                }
+            	JOptionPane.showMessageDialog(null, "Test");
             }
         });
         //Event: Doppelklick auf Item in der Liste, Item muss anschließend via Control bearbeitet werden.
-        // Aufruf in der LierferungBestätigen
-        lList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                JList lList = (JList) e.getSource();
-                if (e.getClickCount() == 2) {
-                    int index = lList.locationToIndex(e.getPoint());
-                    listClick(index, 2);
-                }
-            }
-        });
-        hList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                JList hList = (JList) e.getSource();
-                if (e.getClickCount() == 2) {
-                    int index = hList.locationToIndex(e.getPoint());
-                    listClick(index, 3);
-                }
-            }
-        });
-
-        //RADIOBUTTONS
-        rbEinlieferung.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (rbEinlieferung.isSelected()) {
-                    lTextEdit("Einlieferung");
-                } else lTextEdit("Auslieferung");
-            }
-        });
-    }
-
-    public static void main(String[] args) {
-        GUI test = new GUI();
-        
-        
+//        // Aufruf in der LierferungBestätigen
+//        lList.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                JList lList = (JList) e.getSource();
+//                if (e.getClickCount() == 2) {
+//                    int index = lList.locationToIndex(e.getPoint());
+//                    listClick(index, 2);
+//                }
+//            }
+//        });
+//        hList.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                JList hList = (JList) e.getSource();
+//                if (e.getClickCount() == 2) {
+//                    int index = hList.locationToIndex(e.getPoint());
+//                    listClick(index, 3);
+//                }
+//            }
+//        });
+//
+//        //RADIOBUTTONS
+//        rbEinlieferung.addChangeListener(new ChangeListener() {
+//            @Override
+//            public void stateChanged(ChangeEvent e) {
+//                if (rbEinlieferung.isSelected()) {
+//                    lTextEdit("Einlieferung");
+//                } else lTextEdit("Auslieferung");
+//            }
+//        });
     }
     
 
@@ -210,86 +301,6 @@ public class GUI extends JFrame {
         }
     }
 
-    {
-// GUI initializer generated by IntelliJ IDEA GUI Designer
-// >>> IMPORTANT!! <<<
-// DO NOT EDIT OR ADD ANY CODE HERE!
-        $$$setupUI$$$();
-    }
-
-    /**
-     * Method generated by IntelliJ IDEA GUI Designer
-     * >>> IMPORTANT!! <<<
-     * DO NOT edit this method OR call it in your code!
-     *
-     * @noinspection ALL
-     */
-    private void $$$setupUI$$$() {
-        outerpanel = new JPanel();
-        outerpanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        innerpanel = new JPanel();
-        innerpanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        outerpanel.add(innerpanel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        tabs = new JTabbedPane();
-        innerpanel.add(tabs, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
-        ansicht = new JPanel();
-        ansicht.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabs.addTab("Lageransicht", ansicht);
-        aScrollPane = new JScrollPane();
-        ansicht.add(aScrollPane, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        aList = new JList();
-        aScrollPane.setViewportView(aList);
-        lieferung = new JPanel();
-        lieferung.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabs.addTab("Lieferung", lieferung);
-        lEingabePanel = new JPanel();
-        lEingabePanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 3, new Insets(0, 0, 0, 0), -1, -1));
-        lieferung.add(lEingabePanel, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, 1, null, null, null, 0, false));
-        lEingabeFeld = new JTextField();
-        lEingabePanel.add(lEingabeFeld, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        lieferungDist = new JButton();
-        this.$$$loadButtonText$$$(lieferungDist, ResourceBundle.getBundle("String").getString("lieferung.verteilen"));
-        lEingabePanel.add(lieferungDist, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        rbEinlieferung = new JRadioButton();
-        this.$$$loadButtonText$$$(rbEinlieferung, ResourceBundle.getBundle("String").getString("einlieferung"));
-        lEingabePanel.add(rbEinlieferung, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        rbAuslieferung = new JRadioButton();
-        this.$$$loadButtonText$$$(rbAuslieferung, ResourceBundle.getBundle("String").getString("auslieferung"));
-        lEingabePanel.add(rbAuslieferung, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        lieferungConfirm = new JButton();
-        this.$$$loadButtonText$$$(lieferungConfirm, ResourceBundle.getBundle("String").getString("lieferung.bestatigen"));
-        lEingabePanel.add(lieferungConfirm, new com.intellij.uiDesigner.core.GridConstraints(1, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(106, 50), null, 0, false));
-        lLabel = new JLabel();
-        lLabel.setText("0/0 verteilt.");
-        lEingabePanel.add(lLabel, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        lAnsichtPanel = new JPanel();
-        lAnsichtPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        lieferung.add(lAnsichtPanel, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        lScrollPane = new JScrollPane();
-        lAnsichtPanel.add(lScrollPane, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        lList = new JList();
-        lScrollPane.setViewportView(lList);
-        historie = new JPanel();
-        historie.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabs.addTab("Historie", historie);
-        hScrollPane = new JScrollPane();
-        historie.add(hScrollPane, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        hList = new JList();
-        hScrollPane.setViewportView(hList);
-        toolbarPanel = new JPanel();
-        toolbarPanel.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
-        outerpanel.add(toolbarPanel, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, 1, 1, null, null, null, 0, false));
-        undoButton = new JButton();
-        undoButton.setText("Undo");
-        toolbarPanel.add(undoButton, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(76, 50), null, 0, false));
-        redoButton = new JButton();
-        redoButton.setText("Redo");
-        toolbarPanel.add(redoButton, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(75, 50), null, 0, false));
-        final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
-        toolbarPanel.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, new Dimension(14, 50), null, 0, false));
-        final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
-        outerpanel.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_VERTICAL, 1, 1, null, null, null, 0, false));
-    }
 
     /**
      * @noinspection ALL

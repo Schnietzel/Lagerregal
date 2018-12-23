@@ -68,7 +68,7 @@ class AnsichtTab extends JPanel{
         //Initiales Disablen
         aSpeichern = new JButton();
         aSpeichern.setEnabled(false);
-        aSpeichern.setText("Speichern");
+        aSpeichern.setText("Änderungen übernehmen");
         aBearbPanel.add(aSpeichern);
         //Panels in Ansicht
         this.add(aListePanel);

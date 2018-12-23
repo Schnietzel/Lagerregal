@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 class LieferungTab extends JPanel {
 
@@ -26,6 +25,8 @@ class LieferungTab extends JPanel {
     private JList<Lager> lList;
     private JButton undoButton;
     private JButton redoButton;
+
+    private boolean lieferungAktiv = false;
 
     LieferungTab(){
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

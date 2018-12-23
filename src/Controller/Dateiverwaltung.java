@@ -12,18 +12,16 @@ import Model.Lieferung;
 
 public class Dateiverwaltung
 {	
-	public static void speicherZustand(File datei, ArrayList<Lager> lager) throws IOException
+	public void speicherLager(File datei, ArrayList<Lager> lager) throws IOException
 	{
-		//TODO: Speicher-Dialog
 		FileOutputStream fos = new FileOutputStream(datei);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(lager);
 		oos.close();
 	}
 	
-	public static ArrayList<Lager> ladeZustand(File datei) throws IOException, ClassNotFoundException
+	public ArrayList<Lager> ladeLager(File datei) throws IOException, ClassNotFoundException
 	{
-		//TODO: Lade-Dialog
 		FileInputStream fis = new FileInputStream(datei);
 		ObjectInputStream ois = new ObjectInputStream(fis);
 		ArrayList<Lager> lager = (ArrayList<Lager>) ois.readObject();
@@ -31,22 +29,42 @@ public class Dateiverwaltung
 		return lager;
 	}
 	
-	public static void speicherHistorie(File datei, ArrayList<Lieferung> lieferungen) throws IOException
+	public void exportLager(ArrayList<Lager> lager) throws IOException
 	{
-		//TODO: Speicher-Dialog
+		//TODO: Speicher-Dialog --> speicherLager
+	}
+	
+	public ArrayList<Lager> importLager()
+	{
+		//TODO: Lade-Dialog --> ladeLager
+		return null;
+	}
+	
+	public void speicherHistorie(File datei, ArrayList<Lieferung> lieferungen) throws IOException
+	{
 		FileOutputStream fos = new FileOutputStream(datei);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(lieferungen);
 		oos.close();
 	}
 	
-	public static ArrayList<Lieferung> ladeHistorie(File datei) throws IOException, ClassNotFoundException
+	public ArrayList<Lieferung> ladeHistorie(File datei) throws IOException, ClassNotFoundException
 	{
-		//TODO: Lade-Dialog
 		FileInputStream fis = new FileInputStream(datei);
 		ObjectInputStream ois = new ObjectInputStream(fis);
 		ArrayList<Lieferung> lieferungen = (ArrayList<Lieferung>) ois.readObject();
 		ois.close();
 		return lieferungen;
+	}
+	
+	public void exportHistorie(ArrayList<Lieferung> lieferungen)
+	{
+		// TODO: Speicher-Dialog --> speicherHistorie
+	}
+	
+	public ArrayList<Lieferung> importHistorie()
+	{
+		//TODO: Lade-Dialog --> ladeHistorie
+		return null;
 	}
 }

@@ -17,6 +17,7 @@ import java.awt.event.MouseEvent;
 class LieferungTab extends JPanel {
 
     private JTextField lEingabeFeld;
+    private int lEingabeInt;
     private ObserverLabel lLabel;
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
@@ -133,12 +134,12 @@ class LieferungTab extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: Exception Handling
-                int gesamtmenge = Integer.parseInt(lEingabeFeld.getText());
+                lEingabeInt = Integer.parseInt(lEingabeFeld.getText());
                 if (rbEinlieferung.isSelected()) {
-                    lTextEdit("Einlieferung", 0, gesamtmenge);
-                } else lTextEdit("Auslieferung", 0, gesamtmenge);
+                    lTextEdit("Einlieferung", 0, lEingabeInt);
+                } else lTextEdit("Auslieferung", 0, lEingabeInt);
             
-                boolean gueltig = Buchungsverwaltung.createLieferung(rbAuslieferung.isSelected(), gesamtmenge);
+                boolean gueltig = Buchungsverwaltung.createLieferung(rbAuslieferung.isSelected(), lEingabeInt);
                 if (gueltig)
                     lGueltigeLieferungsZahl();
                 else
@@ -167,7 +168,7 @@ class LieferungTab extends JPanel {
                         return;
                     }
 
-                    BuchungDialog bd = new BuchungDialog(lager, rbAuslieferung.isSelected());
+                    BuchungDialog bd = new BuchungDialog(lager, rbAuslieferung.isSelected(), lEingabeInt);
                     
 //                    boolean gueltig = Buchungsverwaltung.createBuchung(rbAuslieferung.isSelected(), bd.getLager(), bd.getProzent());
 //                    if (gueltig)

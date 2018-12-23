@@ -10,6 +10,8 @@ public class Lager implements Serializable
 	private int bestand;
 	private ArrayList<Lager> unterlager;
 	
+	private int ebene;
+	
 	public Lager()
 	{
 		unterlager = new ArrayList<Lager>();
@@ -21,7 +23,6 @@ public class Lager implements Serializable
 		this.kapazitaet = kapazitaet;
 		this.bestand = bestand;
 		unterlager = new ArrayList<Lager>();
-	
 	}
 
 	public Lager(String name, ArrayList<Lager> unterlager)
@@ -80,9 +81,16 @@ public class Lager implements Serializable
 	@Override
 	public String toString()
 	{
-		return name + ", Bestand: " + bestand + "/" + kapazitaet;
+		String ret = name + ", Bestand: " + bestand + "/" + kapazitaet;
+		for (int i = 0; i < ebene; i++)
+		{
+			ret = "   " + ret;
+		}
+		return ret;
 	}
 	
+	public void setEbene(int ebene) { this.ebene = ebene; }
+	public void setBestand(int bestand) { this.bestand = bestand; }
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
 	public int getKapazitaet() { return kapazitaet; }

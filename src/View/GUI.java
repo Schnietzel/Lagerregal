@@ -17,8 +17,10 @@ import Model.Lieferung;
 
 import static javax.swing.UIManager.*;
 
-public class GUI extends JFrame {
-    private Lagerverwaltung lagerverwaltung;
+public class GUI extends JFrame implements WindowListener {
+    private static Lagerverwaltung lv;
+    private static Dateiverwaltung dv;
+    private static Buchungsverwaltung bv;
 
     private JPanel rootPanel;
     private JTabbedPane tabs;
@@ -33,8 +35,9 @@ public class GUI extends JFrame {
     private JMenuItem miRedo;
 
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException {
-        Lagerverwaltung.initLagerverwaltung();
-        Buchungsverwaltung.initBuchungsverwaltung();
+        lv = ControllerSingleton.getLVInstance();
+        dv = ControllerSingleton.getDVInstance();
+        bv = ControllerSingleton.getBVInstance();
 
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -62,11 +65,18 @@ public class GUI extends JFrame {
 
         tabs = new JTabbedPane();
         rootPanel.add(tabs);
-
-        tabs.addTab("Lageransicht", new AnsichtTab());
-        tabs.addTab("Lieferung", new LieferungTab());
-        tabs.addTab("Historie", new HistorieTab());
+        
+        AnsichtTab aTab = new AnsichtTab();
+        LieferungTab lTab = new LieferungTab();
+        HistorieTab hTab = new HistorieTab();
+        
+        tabs.addTab("Lageransicht", aTab);
+        tabs.addTab("Lieferung", lTab);
+        tabs.addTab("Historie", hTab);
+        
         this.setPreferredSize(new Dimension(450, 500));
+        
+        addWindowListener(this);
     }
 
     private JMenuBar createMenubar() {
@@ -170,4 +180,28 @@ public class GUI extends JFrame {
         return menuBar;
     }
 
+    @Override
+    public void windowClosing(WindowEvent e) 
+    {
+    	lv.close();
+    	bv.close();
+    }
+
+	@Override
+	public void windowActivated(WindowEvent arg0) { }
+
+	@Override
+	public void windowClosed(WindowEvent arg0) { }
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) { }
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) { }
+
+	@Override
+	public void windowIconified(WindowEvent arg0) { }
+
+	@Override
+	public void windowOpened(WindowEvent arg0) { }
 }

@@ -15,32 +15,38 @@ import java.util.ResourceBundle;
 
 public class BuchungDialog extends JDialog {
 	
-    private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
-    private JSlider slider;
-    private JTextField input;
-    private JLabel infoText;
-    private boolean supressSliderChange = false;
+    private JPanel rootPanel;
+    private JButton okButton;
+    private JButton cancelButton;
+    private JSlider prozentSlider;
+    private JTextField prozentTextField;
+    private JLabel lagerLabel;
+    private JLabel verteiltLabel;
+    private boolean supsupressSliderChange = false;
     
     private Lager lager;
     private boolean auslieferung;
-    private Double percentage;
+    private Double prozent;
+    private int zuVerteilen;
+    private int bereitsVerteilt;
 
-    BuchungDialog(Lager info, boolean lieferung) 
+    BuchungDialog(Lager info, boolean lieferung, int zuVerteilen)
     {
     	this.lager = info;
-    	this.percentage = 0.0;
-    	
+    	this.prozent = 0.0;
+    	this.bereitsVerteilt = 0;
+    	this.zuVerteilen = zuVerteilen;
     	initGUI();
     	
-        setContentPane(contentPane);
+        setContentPane(rootPanel);
         this.setTitle("Buchung durchführen");
-        this.infoText.setText(lager.getName());
+        this.lagerLabel.setText("Ausgewähltes Lager: " + lager.getName());
+        this.verteiltLabel.setText(this.bereitsVerteilt + "/" + zuVerteilen + " verteilt.");
         this.auslieferung = lieferung;
         this.pack();
         this.setVisible(true);
-        this.setMinimumSize(new Dimension(450, 200));
+        this.setPreferredSize(new Dimension(250,200));
+        this.setResizable(false);
         this.validate();
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setModal(true);
@@ -49,80 +55,100 @@ public class BuchungDialog extends JDialog {
 
     private void initGUI()
     {
-    	// TODO: loadButtonText entfernen
     	
-    	contentPane = new JPanel();
-    	contentPane.setLayout(new GridLayout());
-      
-    	final JPanel panel1 = new JPanel();
-    	panel1.setLayout(new GridLayout());
-    	contentPane.add(panel1);
-    	
-    	final JPanel panel2 = new JPanel();
-    	panel2.setLayout(new GridLayout());
-    	panel1.add(panel2);
-    	
-    	buttonCancel = new JButton();
-    	this.$$$loadButtonText$$$(buttonCancel, ResourceBundle.getBundle("String").getString("abbrechen"));
-    	panel2.add(buttonCancel);
-      
-    	// TODO: Spacer(?)
-    	// final Spacer spacer1 = new Spacer();
-    	// panel2.add(spacer1);
-      
-    	buttonOK = new JButton();
-    	this.$$$loadButtonText$$$(buttonOK, ResourceBundle.getBundle("String").getString("ok"));
-    	panel2.add(buttonOK);
+    	rootPanel = new JPanel();
+    	rootPanel.setLayout(new BoxLayout(rootPanel, BoxLayout.Y_AXIS));
 
-    	final JPanel panel3 = new JPanel();
-    	panel3.setLayout(new GridLayout());
-    	contentPane.add(panel3);
+        //labelPanel
+    	JPanel labelPanelMain = new JPanel();
+    	JPanel labelPanelA = new JPanel();
+    	JPanel labelPanelB = new JPanel();
 
-    	slider = new JSlider();
-    	panel3.add(slider);
+    	labelPanelMain.setLayout(new BoxLayout(labelPanelMain,BoxLayout.Y_AXIS));
+    	labelPanelA.setLayout(new FlowLayout(FlowLayout.LEFT));
+    	labelPanelB.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        lagerLabel = new JLabel();
+        labelPanelA.add(lagerLabel);
+
+        verteiltLabel = new JLabel();
+        labelPanelB.add(verteiltLabel);
+
+        labelPanelMain.add(labelPanelA);
+        labelPanelMain.add(labelPanelB);
+        rootPanel.add(labelPanelMain);
+        //inputPanel
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        prozentSlider = new JSlider();
+        prozentSlider.setPreferredSize(new Dimension(150,19));
+        prozentSlider.setValue(0);
+        inputPanel.add(prozentSlider);
+
+        prozentTextField = new JTextField();
+        prozentTextField.setPreferredSize(new Dimension(100,19));
+        prozentTextField.setText("0");
+        inputPanel.add(prozentTextField);
+
+
+        rootPanel.add(inputPanel);
+        //buttonPanel
+    	JPanel buttonPanelMain = new JPanel(new GridLayout());
+    	JPanel buttonPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        JPanel buttonPanelRight = new JPanel(new FlowLayout(FlowLayout.TRAILING));
     	
-    	input = new JTextField();
-    	panel3.add(input);
+    	cancelButton = new JButton();
+        cancelButton.setText("Abbrechen");
+    	buttonPanelLeft.add(cancelButton);
+      
+    	okButton = new JButton();
+    	okButton.setText("Bestätigen");
+    	buttonPanelRight.add(okButton);
 
-    	infoText = new JLabel();
-    	panel3.add(infoText);
+        buttonPanelMain.add(buttonPanelLeft);
+        buttonPanelMain.add(buttonPanelRight);
+        rootPanel.add(buttonPanelMain, BorderLayout.PAGE_END);
     }
     
     private void createListener() {
-        buttonOK.addActionListener(new ActionListener() {
+        okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
         });
-        buttonCancel.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onCancel();
             }
         });
-        slider.addChangeListener(new ChangeListener() {
+        prozentSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                if (!supressSliderChange) {
-                    input.setText(String.valueOf(slider.getValue()));
-                    percentage = Double.valueOf(input.getText());
-                } else supressSliderChange = false;
+                if (!supsupressSliderChange) {
+                    prozentTextField.setText(String.valueOf(prozentSlider.getValue()));
+                    prozent = Double.valueOf(prozentTextField.getText());
+                } else supsupressSliderChange = false;
+                bereitsVerteilt = (int) (zuVerteilen * (prozent/100));
+                verteiltLabel.setText(bereitsVerteilt + "/" + zuVerteilen + " verteilt.");
             }
         });
-        input.addActionListener(new ActionListener() {
+        prozentTextField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                inputAction();
+                prozentTextFieldAction();
             }
         });
     }
 
     private void onOK() {
         //TODO: Wert an Control übergeben, Lager "disablen"
-        //percentage ist der wert (werte von 0,00-100,00)
-    	System.out.println(percentage);
-    	ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, percentage);
+    	
+        //prozent ist der wert (werte von 0,00-100,00)
+    	System.out.println(prozent);
+    	ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, prozent);
+
         dispose();
     }
 
@@ -133,26 +159,26 @@ public class BuchungDialog extends JDialog {
 
     private void changeLabel(Double percent) {
         //TODO: muss noch kram getan werden
-        //double max = Double.parseDouble(this.infoText.getText().replaceAll("/.", ""));
+        //double max = Double.parseDouble(this.lagerLabel.getText().replaceAll("/.", ""));
         //double allocated = max / (percent/100);
         //System.out.println(max);
         //System.out.println(percent);
-        //this.infoText.setText(this.infoText.getText().replaceAll("^\\d*[.,]?\\d*[^/]",Double.toString(allocated)));
+        //this.lagerLabel.setText(this.lagerLabel.getText().replaceAll("^\\d*[.,]?\\d*[^/]",Double.toString(allocated)));
     }
 
-    private void inputAction() {
+    private void prozentTextFieldAction() {
         //PopUpDialog popUp = new PopUpDialog();
         GUITools check = new GUITools();
-        slider.setValue(Integer.parseInt(input.getText()));
-        int errorCode = check.BuchungInput(input.getText());
+        prozentSlider.setValue(Integer.parseInt(prozentTextField.getText()));
+        int errorCode = check.BuchungInput(prozentTextField.getText());
 //        //TODO: Fehlerhandling ggf. auslagern
-//        switch (errorCode) {
-//            case 0:
-//                supressSliderChange = true;
-//                slider.setValue(check.iValue);
-//                percentage = check.dValue;
-//                //changeLabel(check.dValue);
-//                break;
+        switch (errorCode) {
+            case 0:
+                supsupressSliderChange = true;
+                prozentSlider.setValue(check.iValue);
+                prozent = check.dValue;
+                System.out.println(prozent);
+                break;
 //            case 1:
 //                popUp.setMeldung("Nur Zahlenbereiche von 0-100.");
 //                popUp.popUp();
@@ -166,7 +192,7 @@ public class BuchungDialog extends JDialog {
 //                popUp.setTitle("Mertens, das sollte nicht so sein!");
 //                popUp.popUp();
 //                break;
-//        }
+        }
     }
 
     public Lager getLager()
@@ -176,40 +202,6 @@ public class BuchungDialog extends JDialog {
     
     public double getProzent()
     {
-    	return percentage;
-    }
-    
-    /**
-     * @noinspection ALL
-     */
-    private void $$$loadButtonText$$$(AbstractButton component, String text) {
-        StringBuffer result = new StringBuffer();
-        boolean haveMnemonic = false;
-        char mnemonic = '\0';
-        int mnemonicIndex = -1;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == '&') {
-                i++;
-                if (i == text.length()) break;
-                if (!haveMnemonic && text.charAt(i) != '&') {
-                    haveMnemonic = true;
-                    mnemonic = text.charAt(i);
-                    mnemonicIndex = result.length();
-                }
-            }
-            result.append(text.charAt(i));
-        }
-        component.setText(result.toString());
-        if (haveMnemonic) {
-            component.setMnemonic(mnemonic);
-            component.setDisplayedMnemonicIndex(mnemonicIndex);
-        }
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    public JComponent $$$getRootComponent$$$() {
-        return contentPane;
+    	return prozent;
     }
 }

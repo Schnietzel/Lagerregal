@@ -36,4 +36,10 @@ public class Lieferung implements Serializable
 	{
 		return buchungen;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "Lieferung vom " + timestamp + " über " + gesamtmenge + " Artikel";
+	}
 }

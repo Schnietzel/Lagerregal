@@ -1,5 +1,6 @@
 package View;
 
+import Controller.ControllerSingleton;
 import Controller.GUITools;
 import Controller.Lagerverwaltung;
 import Model.Lager;
@@ -13,7 +14,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 class AnsichtTab extends JPanel{
-
+	GUITools gt;
     JList aList;
 
     JLabel aName;
@@ -22,7 +23,9 @@ class AnsichtTab extends JPanel{
     JTextField aTbKapazitaet;
     JButton aSpeichern;
 
-    AnsichtTab(){
+    AnsichtTab()
+    {
+    	gt = ControllerSingleton.getGTInstance();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         //Panel für die Liste erstellen
@@ -30,8 +33,7 @@ class AnsichtTab extends JPanel{
         JPanel aListePanel = new JPanel(new BorderLayout());
         // TestLager Anzeigen lassen
         DefaultListModel<Lager> dlm = new DefaultListModel<>();
-        GUITools gt = new GUITools();
-        gt.getLagerRecursive(Lagerverwaltung.getLagerList(), dlm);
+        gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
         //Liste an JList
         //AnsichtTab
         aList = new JList<>(dlm);
@@ -105,6 +107,7 @@ class AnsichtTab extends JPanel{
                 selected.setKapazitaet(Integer.parseInt(aTbKapazitaet.getText()));
 
                 // TODO: Kapazitäten aller Lager aktualisieren (Observer?)
+                ControllerSingleton.getLVInstance().updateLager();
                 aList.updateUI();
             }
         });

@@ -1,6 +1,8 @@
 package Model;
 
-public class Buchung 
+import java.io.Serializable;
+
+public class Buchung implements Serializable
 {
 	private Lager ziellager;
 	private double prozent;
@@ -32,4 +34,9 @@ public class Buchung
 		this.prozent = prozent;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "   " + ziellager.getName() + ": " + prozent + "%";
+	}
 }

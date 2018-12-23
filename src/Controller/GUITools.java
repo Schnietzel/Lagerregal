@@ -1,6 +1,8 @@
 package Controller;
 
+import Model.Buchung;
 import Model.Lager;
+import Model.Lieferung;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -31,7 +33,6 @@ public class GUITools {
 
     public void getLagerRecursive(ArrayList<Lager> lager, DefaultListModel<Lager> dlm)
     {
-        // TODO: Unterlager einrücken
         for(Lager l : lager)
         {
             dlm.addElement(l);
@@ -39,4 +40,16 @@ public class GUITools {
         }
 
     }
+
+	public void getLieferung(ArrayList<Lieferung> historie, DefaultListModel dlm) 
+	{
+		for (Lieferung l : historie)
+        {
+        	dlm.addElement(l.toString());
+        	for (Buchung b : l.getBuchungen())
+        	{
+        		dlm.addElement(b.toString());
+        	}
+        }
+	}
 }

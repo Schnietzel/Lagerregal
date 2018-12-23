@@ -1,6 +1,7 @@
 package View;
 
 import Controller.Buchungsverwaltung;
+import Controller.ControllerSingleton;
 import Controller.GUITools;
 import Model.Lager;
 import javax.swing.*;
@@ -121,7 +122,7 @@ public class BuchungDialog extends JDialog {
         //TODO: Wert an Control übergeben, Lager "disablen"
         //percentage ist der wert (werte von 0,00-100,00)
     	System.out.println(percentage);
-    	Buchungsverwaltung.createBuchung(auslieferung, lager, percentage);
+    	ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, percentage);
         dispose();
     }
 

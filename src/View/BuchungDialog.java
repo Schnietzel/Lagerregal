@@ -1,6 +1,6 @@
 package View;
 
-import Controller.EingabeCheck;
+import Controller.GUITools;
 import Model.Lager;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -134,7 +134,7 @@ public class BuchungDialog extends JDialog {
 
     private void inputAction() {
         PopUpDialog popUp = new PopUpDialog();
-        EingabeCheck check = new EingabeCheck();
+        GUITools check = new GUITools();
         int errorCode = check.BuchungInput(input.getText());
         //TODO: Fehlerhandling ggf. auslagern
         switch (errorCode) {

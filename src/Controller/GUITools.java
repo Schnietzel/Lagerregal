@@ -1,9 +1,15 @@
 package Controller;
 
-public class EingabeCheck {
+import Model.Lager;
+
+import javax.swing.*;
+import java.util.ArrayList;
+
+public class GUITools {
 
     public Double dValue;
     public int iValue;
+    //Klasse mit tollem Zeug für die GUI - Quasi ein Werkzeugkasten
 
     public boolean BuchungOK(String eingabe){
         //Eingabe verarbeiten
@@ -20,6 +26,17 @@ public class EingabeCheck {
             if(this.iValue <= 100 && iValue >= 0) return 0;
             else return 1;
         } else return 2;
+
+    }
+
+    public void getLagerRecursive(ArrayList<Lager> lager, DefaultListModel<Lager> dlm)
+    {
+        // TODO: Unterlager einrücken
+        for(Lager l : lager)
+        {
+            dlm.addElement(l);
+            getLagerRecursive(l.getUnterlager(), dlm);
+        }
 
     }
 }

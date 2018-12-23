@@ -18,6 +18,7 @@ public class Lagerverwaltung
 	public Lagerverwaltung()
 	{
 		ladeLager();
+		updateLager();
 	}
 	
 	private void ladeLager()

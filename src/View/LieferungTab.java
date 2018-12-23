@@ -1,8 +1,10 @@
 package View;
 
 import Controller.Buchungsverwaltung;
+import Controller.ControllerSingleton;
 import Controller.GUITools;
 import Controller.Lagerverwaltung;
+import Controller.ControllerSingleton;
 import Model.Lager;
 
 import javax.swing.*;
@@ -82,7 +84,7 @@ class LieferungTab extends JPanel {
         //Liste füllen
         DefaultListModel<Lager> dlm = new DefaultListModel<>();
         GUITools gt = new GUITools();
-        gt.getLagerRecursive(Lagerverwaltung.getLagerList(), dlm);
+        gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
 
         //Liste an JList
         lList = new JList<>(dlm);
@@ -138,7 +140,7 @@ class LieferungTab extends JPanel {
                     lTextEdit("Einlieferung", 0, gesamtmenge);
                 } else lTextEdit("Auslieferung", 0, gesamtmenge);
             
-                boolean gueltig = Buchungsverwaltung.createLieferung(rbAuslieferung.isSelected(), gesamtmenge);
+                boolean gueltig = ControllerSingleton.getBVInstance().createLieferung(rbAuslieferung.isSelected(), gesamtmenge);
                 if (gueltig)
                     lGueltigeLieferungsZahl();
                 else
@@ -156,7 +158,7 @@ class LieferungTab extends JPanel {
                 {
                     // TODO: Buchung Handlen
                     Lager lager = lList.getSelectedValue();
-                    if (Buchungsverwaltung.istBearbeitet(lager))
+                    if (ControllerSingleton.getBVInstance().istBearbeitet(lager))
                     {
                         JOptionPane.showMessageDialog(null, "Lager ist bereits bearbeitet! (Ggf. Undo benutzen)");
                         return;
@@ -184,7 +186,7 @@ class LieferungTab extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
-                boolean gueltig = Buchungsverwaltung.verteileLieferung(rbAuslieferung.isSelected());
+                boolean gueltig = ControllerSingleton.getBVInstance().verteileLieferung(rbAuslieferung.isSelected());
                 if (gueltig)
                     lGueltigeLieferung();
                 else

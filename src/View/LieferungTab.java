@@ -17,7 +17,7 @@ import java.awt.event.MouseEvent;
 class LieferungTab extends JPanel {
 
     private JTextField lEingabeFeld;
-    private JLabel lLabel;
+    private ObserverLabel lLabel;
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
     private JButton lieferungDist;
@@ -97,7 +97,7 @@ class LieferungTab extends JPanel {
         JPanel lBearbPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JPanel lBearbPanelRight = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
-        lLabel = new JLabel();
+        lLabel = new ObserverLabel();
         lLabel.setText("0/0 verteilt.");
         lBearbPanelLeft.add(lLabel);
 
@@ -134,6 +134,10 @@ class LieferungTab extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 // TODO: Exception Handling
                 int gesamtmenge = Integer.parseInt(lEingabeFeld.getText());
+                if (rbEinlieferung.isSelected()) {
+                    lTextEdit("Einlieferung", 0, gesamtmenge);
+                } else lTextEdit("Auslieferung", 0, gesamtmenge);
+            
                 boolean gueltig = Buchungsverwaltung.createLieferung(rbAuslieferung.isSelected(), gesamtmenge);
                 if (gueltig)
                     lGueltigeLieferungsZahl();
@@ -205,13 +209,23 @@ class LieferungTab extends JPanel {
     }
 
     private void lTextEdit(String lieferung) {
-        lLabel.setText(lieferung + ": " + "Zahl" + "/" + "Zahl" + " verteilt.");
+        lLabel.setText(lieferung + ": " + "Zahl" + "/" + lEingabeFeld.getText()+ " verteilt.");
         //TODO: infoText nach Buchung anpassen (muss nach jeder Buchung, jedem schließen des Dialogs, ausgeführt werden)
         //Schema des Texts:
         //Einlieferung: xxxx/xxxx verteilt.
         //Auslieferung: xxxx/xxxx verteilt.
 
     }
+    
+    private void lTextEdit(String lieferung, int zahl, int gesamt) {
+        lLabel.setText(lieferung + ": " + zahl + "/" + gesamt+ " verteilt.");
+        //TODO: infoText nach Buchung anpassen (muss nach jeder Buchung, jedem schließen des Dialogs, ausgeführt werden)
+        //Schema des Texts:
+        //Einlieferung: xxxx/xxxx verteilt.
+        //Auslieferung: xxxx/xxxx verteilt.
+
+    }
+    
     private void lGueltigeLieferungsZahl()
     {
         setLieferungAktiv(true);

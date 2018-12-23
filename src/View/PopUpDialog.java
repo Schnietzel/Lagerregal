@@ -9,8 +9,8 @@ import java.awt.*;
 import java.util.ResourceBundle;
 
 public class PopUpDialog extends JDialog {
-    private JPanel contentPane;
-    private JButton buttonOK;
+    private JPanel contentPane = new JPanel();
+    private JButton buttonOK = new JButton();
     private JLabel infoText;
 
     PopUpDialog() {

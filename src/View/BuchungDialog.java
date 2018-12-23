@@ -140,31 +140,32 @@ public class BuchungDialog extends JDialog {
     }
 
     private void inputAction() {
-        PopUpDialog popUp = new PopUpDialog();
+        //PopUpDialog popUp = new PopUpDialog();
         GUITools check = new GUITools();
+        slider.setValue(Integer.parseInt(input.getText()));
         int errorCode = check.BuchungInput(input.getText());
-        //TODO: Fehlerhandling ggf. auslagern
-        switch (errorCode) {
-            case 0:
-                supressSliderChange = true;
-                slider.setValue(check.iValue);
-                percentage = check.dValue;
-                //changeLabel(check.dValue);
-                break;
-            case 1:
-                popUp.setMeldung("Nur Zahlenbereiche von 0-100.");
-                popUp.popUp();
-                break;
-            case 2:
-                popUp.setMeldung("Bitte nur Zahlen eingeben.");
-                popUp.popUp();
-                break;
-            default:
-                popUp.setMeldung("Ein unerwarteter Fehler ist aufgetreten.");
-                popUp.setTitle("Mertens, das sollte nicht so sein!");
-                popUp.popUp();
-                break;
-        }
+//        //TODO: Fehlerhandling ggf. auslagern
+//        switch (errorCode) {
+//            case 0:
+//                supressSliderChange = true;
+//                slider.setValue(check.iValue);
+//                percentage = check.dValue;
+//                //changeLabel(check.dValue);
+//                break;
+//            case 1:
+//                popUp.setMeldung("Nur Zahlenbereiche von 0-100.");
+//                popUp.popUp();
+//                break;
+//            case 2:
+//                popUp.setMeldung("Bitte nur Zahlen eingeben.");
+//                popUp.popUp();
+//                break;
+//            default:
+//                popUp.setMeldung("Ein unerwarteter Fehler ist aufgetreten.");
+//                popUp.setTitle("Mertens, das sollte nicht so sein!");
+//                popUp.popUp();
+//                break;
+//        }
     }
 
     public Lager getLager()

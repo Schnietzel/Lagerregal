@@ -1,5 +1,7 @@
 package Controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 import Model.Auslieferung;
@@ -11,29 +13,73 @@ import Model.Zulieferung;
 
 public class Buchungsverwaltung
 {
-	private static Stack<Buchung> buchungenUndo;
-	private static Stack<Buchung> buchungenRedo;
+	private Lagerverwaltung lv;
+	private Dateiverwaltung dv;
 	
-	private static Stack<Lieferung> lieferungenUndo;
-	private static Stack<Lieferung> lieferungenRedo;
+	private Stack<Buchung> buchungenUndo;
+	private Stack<Buchung> buchungenRedo;
 	
-	private static Lieferung aktuelleLieferung;
+	private Stack<Lieferung> lieferungenUndo;
+	private Stack<Lieferung> lieferungenRedo;
+	private ArrayList<Lieferung> historie;
+	
+	private Lieferung aktuelleLieferung;
 
-	private static int restMenge;
+	private int restMenge;
 	
-	public static void initBuchungsverwaltung()
+	public Buchungsverwaltung()
 	{
+		lv = ControllerSingleton.getLVInstance();
+		dv = ControllerSingleton.getDVInstance();
+		
 		buchungenUndo = new Stack<Buchung>();
 		buchungenRedo = new Stack<Buchung>();
 		
-		// TODO: lieferungen-Historie aus speicher laden
 		lieferungenUndo = new Stack<Lieferung>();
 		lieferungenRedo = new Stack<Lieferung>();
+		
+		ladeHistorie();
 	}
 	
-	public static boolean createZulieferung(int gesamtmenge)
+	private void ladeHistorie()
 	{
-		if (gesamtmenge > Lagerverwaltung.getFreieGesamtlagerkapazität())
+		// TODO: Datei festlegen, Exceptions und so
+		try 
+		{
+			String datei = "C:\\Test\\bla.historie";
+			File file = new File(datei);
+			historie = dv.ladeHistorie(file);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			historie = new ArrayList<Lieferung>();
+		}
+	}
+	
+	public void close()
+	{
+		// TODO: Datei festlegen, Exceptions und so
+		try
+		{
+			String datei = "C:\\Test\\bla.historie";
+			File file = new File(datei);
+			dv.speicherHistorie(file, historie);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public ArrayList<Lieferung> getHistorie()
+	{
+		return historie;
+	}
+	
+	public boolean createZulieferung(int gesamtmenge)
+	{
+		if (gesamtmenge > lv.getFreieGesamtlagerkapazität())
 		{
 			return false;
 		}
@@ -43,7 +89,7 @@ public class Buchungsverwaltung
 		return true;
 	}
 	
-	public static boolean createZubuchung(Lager lager, double prozent)
+	public boolean createZubuchung(Lager lager, double prozent)
 	{
 		int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
 		if (menge > lager.getKapazitaet() || menge > restMenge)
@@ -57,7 +103,7 @@ public class Buchungsverwaltung
 		return true;
 	}
 	
-	public static void verteileZulieferung()
+	public void verteileZulieferung()
 	{
 		int size = buchungenUndo.size();
 		for (int i = 0; i < size; i++)
@@ -75,11 +121,12 @@ public class Buchungsverwaltung
 		}
 		
 		lieferungenUndo.push(aktuelleLieferung);
+		historie.add(aktuelleLieferung);
 	}
 	
-	public static boolean createAuslieferung(int gesamtmenge)
+	public boolean createAuslieferung(int gesamtmenge)
 	{
-		if (gesamtmenge > Lagerverwaltung.getGesamtbestand())
+		if (gesamtmenge > lv.getGesamtbestand())
 		{
 			return false;
 		}
@@ -89,7 +136,7 @@ public class Buchungsverwaltung
 		return true;
 	}
 	
-	public static boolean createAbbuchung(Lager lager, double prozent)
+	public boolean createAbbuchung(Lager lager, double prozent)
 	{
 		int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
 		if (menge > lager.getBestand() || menge > restMenge)
@@ -103,7 +150,7 @@ public class Buchungsverwaltung
 		return true;
 	}
 	
-	public static void verteileAuslieferung()
+	public void verteileAuslieferung()
 	{
 		for (int i = 0; i < buchungenUndo.size(); i++)
 		{
@@ -118,21 +165,22 @@ public class Buchungsverwaltung
 		}
 		
 		lieferungenUndo.push(aktuelleLieferung);
+		historie.add(aktuelleLieferung);
 	}
 	
-	public static void undoBuchung()
+	public void undoBuchung()
 	{
 		buchungenRedo.push(buchungenUndo.pop());
 		// ausgrauen rückgängig machen
 	}
 	
-	public static void redoBuchung()
+	public void redoBuchung()
 	{
 		buchungenUndo.push(buchungenRedo.pop());
 		// ausgrauen wiederherstellen
 	}
 	
-	public static void undoLieferung()
+	public void undoLieferung()
 	{
 		aktuelleLieferung = lieferungenUndo.pop();
 		if (aktuelleLieferung.getClass().equals(Auslieferung.class))
@@ -144,9 +192,10 @@ public class Buchungsverwaltung
 			verteileAuslieferung();
 		}
 		lieferungenRedo.push(aktuelleLieferung);
+		historie.remove(aktuelleLieferung);
 	}
 	
-	public static void redoLieferung()
+	public void redoLieferung()
 	{
 		aktuelleLieferung = lieferungenRedo.pop();
 		if (aktuelleLieferung.getClass().equals(Auslieferung.class))
@@ -158,24 +207,25 @@ public class Buchungsverwaltung
 			verteileAuslieferung();
 		}
 		lieferungenUndo.push(aktuelleLieferung);
+		historie.add(aktuelleLieferung);
 	}
 	
-	private static int getEinzelmenge(int Gesamtmenge, double prozent)
+	private int getEinzelmenge(int Gesamtmenge, double prozent)
 	{
 		return (int) (((double) Gesamtmenge / 100.0 * prozent) + 0.5);
 	}
 	
-	public static double getSchrittweite(int Gesamtmenge)
+	public double getSchrittweite(int Gesamtmenge)
 	{
 		return 100.0 / (double)Gesamtmenge;
 	}
 	
-	public static Stack<Buchung> getBuchungenUndoStack() { return buchungenUndo; }
-	public static Stack<Buchung> getBuchungenRedoStack() { return buchungenRedo; }
-	public static Stack<Lieferung> getLieferungenUndoStack() { return lieferungenUndo; }
-	public static Stack<Lieferung> getLieferungenRedoStack() { return lieferungenRedo; }
+	public Stack<Buchung> getBuchungenUndoStack() { return buchungenUndo; }
+	public Stack<Buchung> getBuchungenRedoStack() { return buchungenRedo; }
+	public Stack<Lieferung> getLieferungenUndoStack() { return lieferungenUndo; }
+	public Stack<Lieferung> getLieferungenRedoStack() { return lieferungenRedo; }
 
-	public static boolean createLieferung(boolean Auslieferung, int gesamtmenge)
+	public boolean createLieferung(boolean Auslieferung, int gesamtmenge)
 	{
 		if (Auslieferung)
 			return createAuslieferung(gesamtmenge);
@@ -183,7 +233,7 @@ public class Buchungsverwaltung
 			return createZulieferung(gesamtmenge);
 	}
 
-	public static boolean createBuchung(boolean auslieferung, Lager lager, double prozent)
+	public boolean createBuchung(boolean auslieferung, Lager lager, double prozent)
 	{
 		System.out.println(prozent);
 		if (auslieferung)
@@ -192,17 +242,17 @@ public class Buchungsverwaltung
 			return createZubuchung(lager, prozent);
 	}
 
-	public static int getRestMenge()
+	public int getRestMenge()
 	{
 		return restMenge;
 	}
 	
-	public static boolean istBearbeitet(Lager lager)
+	public boolean istBearbeitet(Lager lager)
 	{
 		return buchungenUndo.contains(lager);
 	}
 
-	public static boolean verteileLieferung(boolean auslieferung)
+	public boolean verteileLieferung(boolean auslieferung)
 	{
 		if (restMenge > 0)
 			return false;

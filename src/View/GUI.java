@@ -68,15 +68,4 @@ public class GUI extends JFrame {
         this.setPreferredSize(new Dimension(450,500));
     }
 
-    private void getLagerRecursive(ArrayList<Lager> lager, DefaultListModel<Lager> dlm)
-	{
-    	// TODO: Unterlager einrücken
-        for(Lager l : lager) 
-        {
-        	dlm.addElement(l);
-        	getLagerRecursive(l.getUnterlager(), dlm);
-        }
-		
-	}
-
 }

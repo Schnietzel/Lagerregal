@@ -163,12 +163,13 @@ class LieferungTab extends JPanel {
                         return;
                     }
 
-                    BuchungDialog bd = new BuchungDialog(lager);
-                    boolean gueltig = Buchungsverwaltung.createBuchung(rbAuslieferung.isSelected(), bd.getLager(), bd.getProzent());
-                    if (gueltig)
-                        lGueltigeBuchungsZahl();
-                    else
-                        lUngueltigeZahl();
+                    BuchungDialog bd = new BuchungDialog(lager, rbAuslieferung.isSelected());
+                    
+//                    boolean gueltig = Buchungsverwaltung.createBuchung(rbAuslieferung.isSelected(), bd.getLager(), bd.getProzent());
+//                    if (gueltig)
+//                        lGueltigeBuchungsZahl();
+//                    else
+//                        lUngueltigeZahl();
                     // TODO: Handlen ob Gültig oder nicht
                 }
             }
@@ -219,6 +220,8 @@ class LieferungTab extends JPanel {
     private void lGueltigeBuchungsZahl()
     {
         // TODO: Irgendwie in Liste bemerkbar machen
+    	
+    	
     }
 
     private void lGueltigeLieferung()

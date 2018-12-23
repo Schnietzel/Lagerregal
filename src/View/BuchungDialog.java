@@ -1,5 +1,6 @@
 package View;
 
+import Controller.Buchungsverwaltung;
 import Controller.GUITools;
 import Model.Lager;
 import javax.swing.*;
@@ -12,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.ResourceBundle;
 
 public class BuchungDialog extends JDialog {
+	
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -21,9 +23,10 @@ public class BuchungDialog extends JDialog {
     private boolean supressSliderChange = false;
     
     private Lager lager;
+    private boolean auslieferung;
     private Double percentage;
 
-    BuchungDialog(Lager info) 
+    BuchungDialog(Lager info, boolean lieferung) 
     {
     	this.lager = info;
     	this.percentage = 0.0;
@@ -33,6 +36,7 @@ public class BuchungDialog extends JDialog {
         setContentPane(contentPane);
         this.setTitle("Buchung durchführen");
         this.infoText.setText(lager.getName());
+        this.auslieferung = lieferung;
         this.pack();
         this.setVisible(true);
         this.setMinimumSize(new Dimension(450, 200));
@@ -101,6 +105,7 @@ public class BuchungDialog extends JDialog {
             public void stateChanged(ChangeEvent e) {
                 if (!supressSliderChange) {
                     input.setText(String.valueOf(slider.getValue()));
+                    percentage = Double.valueOf(input.getText());
                 } else supressSliderChange = false;
             }
         });
@@ -115,6 +120,8 @@ public class BuchungDialog extends JDialog {
     private void onOK() {
         //TODO: Wert an Control übergeben, Lager "disablen"
         //percentage ist der wert (werte von 0,00-100,00)
+    	System.out.println(percentage);
+    	Buchungsverwaltung.createBuchung(auslieferung, lager, percentage);
         dispose();
     }
 

@@ -3,14 +3,28 @@ package Controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import Model.Lager;
 import Model.Lieferung;
+import View.GUI;
 
 public class Lagerverwaltung
 {
 	private static ArrayList<Lager> lager = new ArrayList<Lager>();;
 	private static ArrayList<Lieferung> lieferungen;
 	
+//	  public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException {
+//        Lagerverwaltung.initLagerverwaltung();
+//        Buchungsverwaltung.initBuchungsverwaltung();
+//
+//        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//
+//        GUI gui = new GUI();
+//    }
+//	
 	public static void initLagerverwaltung() throws ClassNotFoundException, IOException
 	{
 		lager = new ArrayList<Lager>();
@@ -71,7 +85,7 @@ public class Lagerverwaltung
 		ArrayList<Lager> lFrankreich = new ArrayList<Lager>();
 		ArrayList<Lager> lEuropa = new ArrayList<Lager>();
 		
-		Lager Hannover = new Lager("Hannover", 10, 10);
+		Lager Hannover = new Lager("Hannover", 10, 0);
 		Lager Nienburg = new Lager("Nienburg", 10, 10);
 		lNds.add(Hannover);
 		lNds.add(Nienburg);

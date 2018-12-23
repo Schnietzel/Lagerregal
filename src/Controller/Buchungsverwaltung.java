@@ -59,12 +59,15 @@ public class Buchungsverwaltung
 	
 	public static void verteileZulieferung()
 	{
-		for (int i = 0; i < buchungenUndo.size(); i++)
+		int size = buchungenUndo.size();
+		for (int i = 0; i < size; i++)
 		{
+		
 			Buchung buchung = buchungenUndo.pop();
 			aktuelleLieferung.addBuchung(buchung);
 		}
 		
+		System.out.println("Buchungsliste der Aktuelle Lieferung:"+ aktuelleLieferung.getBuchungen().size()+" Elemente");
 		for (Buchung buchung : aktuelleLieferung.getBuchungen())
 		{
 			int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), buchung.getProzent());
@@ -182,6 +185,7 @@ public class Buchungsverwaltung
 
 	public static boolean createBuchung(boolean auslieferung, Lager lager, double prozent)
 	{
+		System.out.println(prozent);
 		if (auslieferung)
 			return createAbbuchung(lager, prozent);
 		else

@@ -13,52 +13,51 @@ import View.GUI;
 
 public class Lagerverwaltung
 {
-	private static ArrayList<Lager> lager = new ArrayList<Lager>();;
-	private static ArrayList<Lieferung> lieferungen;
+	private ArrayList<Lager> lager = new ArrayList<Lager>();
 	
-//	  public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException {
-//        Lagerverwaltung.initLagerverwaltung();
-//        Buchungsverwaltung.initBuchungsverwaltung();
-//
-//        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//
-//        GUI gui = new GUI();
-//    }
-//	
-	public static void initLagerverwaltung() throws ClassNotFoundException, IOException
+	public Lagerverwaltung()
 	{
-		lager = new ArrayList<Lager>();
-		
-		initTestlager();
+		ladeLager();
 	}
-
-	private static void onStartup() throws IOException, ClassNotFoundException
+	
+	private void ladeLager()
 	{
 		// TODO: Datei festlegen, Exceptions und so
-		String datei = "C:\\Test\\bla.historie";
-		File file = new File(datei);
-		lieferungen = Dateiverwaltung.ladeHistorie(file);
+		try 
+		{
+			String datei = "C:\\Test\\bla.lager";
+			File file = new File(datei);
+			lager = ControllerSingleton.getDVInstance().ladeLager(file);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			lager = new ArrayList<Lager>();
+			initTestlager();
+		}
 	}
 	
-	private static void onShutdown() throws IOException
+	public void close()
 	{
 		// TODO: Datei festlegen, Exceptions und so
-		String datei = "C:\\Test\\bla.historie";
-		File file = new File(datei);
-		Dateiverwaltung.speicherHistorie(file, lieferungen);
+		try
+		{
+			String datei = "C:\\Test\\bla.lager";
+			File file = new File(datei);
+			ControllerSingleton.getDVInstance().speicherLager(file, lager);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
-	public static void changeName(Lager lager, String neuerName)
-	{
-		lager.setName(neuerName);
-	}
-	
-	public static ArrayList<Lager> getLagerList()
+	public ArrayList<Lager> getLagerList()
 	{
 		return lager;
 	}
 	
-	public static int getFreieGesamtlagerkapazität()
+	public int getFreieGesamtlagerkapazität()
 	{
 		int kap = 0;
 		for (Lager l : lager)
@@ -68,7 +67,7 @@ public class Lagerverwaltung
 		return kap;
 	}
 	
-	public static int getGesamtbestand()
+	public int getGesamtbestand()
 	{
 		int bestand = 0;
 		for (Lager l : lager)
@@ -78,7 +77,38 @@ public class Lagerverwaltung
 		return bestand;
 	}
 	
-	public static void initTestlager()
+	public void updateLager()
+	{
+		for (Lager l : lager)
+		{
+			updateLagerRec(l, 0);
+		}
+	}
+	
+	private void updateLagerRec(Lager l, int depth)
+	{
+		l.setEbene(depth);
+		depth++;
+		for (Lager sub : l.getUnterlager())
+		{
+			updateLagerRec(sub, depth);
+		}
+		
+		if (!l.getUnterlager().isEmpty())
+		{
+			int bestand = 0;
+			int kap = 0;
+			for (Lager sub : l.getUnterlager())
+			{
+				bestand += sub.getBestand();
+				kap += sub.getKapazitaet();
+			}
+			l.setBestand(bestand);
+			l.setKapazitaet(kap);
+		}
+	}
+	
+	public void initTestlager()
 	{
 		ArrayList<Lager> lNds = new ArrayList<Lager>();
 		ArrayList<Lager> lDeutschland = new ArrayList<Lager>();

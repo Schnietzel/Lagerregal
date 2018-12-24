@@ -3,6 +3,8 @@ package Controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Stack;
 import Model.Auslieferung;
 import Model.Buchung;
@@ -11,7 +13,7 @@ import Model.Lieferung;
 import Model.LieferungFactory;
 import Model.Zulieferung;
 
-public class Buchungsverwaltung
+public class Buchungsverwaltung 
 {
 	private Lagerverwaltung lv;
 	private Dateiverwaltung dv;
@@ -25,7 +27,16 @@ public class Buchungsverwaltung
 	
 	private Lieferung aktuelleLieferung;
 
+	public Lieferung getAktuelleLieferung() {
+		return aktuelleLieferung;
+	}
+
+	public void setAktuelleLieferung(Lieferung aktuelleLieferung) {
+		this.aktuelleLieferung = aktuelleLieferung;
+	}
+
 	private int restMenge;
+	int verteilteMenge;
 	
 	public Buchungsverwaltung()
 	{
@@ -100,6 +111,7 @@ public class Buchungsverwaltung
 		Buchung buchung = new Buchung(lager, prozent);
 		buchungenUndo.push(buchung);
 		restMenge -= menge;
+		verteilteMenge += menge;
 		return true;
 	}
 	
@@ -147,6 +159,9 @@ public class Buchungsverwaltung
 		Buchung buchung = new Buchung(lager, prozent);
 		buchungenUndo.push(buchung);
 		restMenge -= menge;
+		verteilteMenge += menge;
+		//hier muss die verteilte menge geupdatet werden
+		
 		return true;
 	}
 	
@@ -227,10 +242,12 @@ public class Buchungsverwaltung
 
 	public boolean createLieferung(boolean Auslieferung, int gesamtmenge)
 	{
+		verteilteMenge=0;
 		if (Auslieferung)
 			return createAuslieferung(gesamtmenge);
 		else
 			return createZulieferung(gesamtmenge);
+		
 	}
 
 	public boolean createBuchung(boolean auslieferung, Lager lager, double prozent)
@@ -245,6 +262,10 @@ public class Buchungsverwaltung
 	public int getRestMenge()
 	{
 		return restMenge;
+	}
+	
+	public int getVerteilteMenge() {
+		return verteilteMenge;
 	}
 	
 	public boolean istBearbeitet(Lager lager)
@@ -262,4 +283,6 @@ public class Buchungsverwaltung
 			verteileZulieferung();
 		return true;
 	}
+
+	
 }

@@ -14,17 +14,18 @@ import java.awt.event.MouseEvent;
 class HistorieTab extends JPanel{
     private GUITools gt;
 
-    private JList hList;
+    public static ObserverJList hList = new ObserverJList();
     HistorieTab()
     {
     	gt = ControllerSingleton.getGTInstance();
         this.setLayout(new BorderLayout());
 
         DefaultListModel dlm = new DefaultListModel();
-        gt.getLieferung(ControllerSingleton.getBVInstance().getHistorie(), dlm);
+        //gt.getLieferung(ControllerSingleton.getBVInstance().getHistorie(), dlm);
         
         
-        hList = new JList(dlm);
+        hList.setModel(dlm);
+       
         
         //JList an Scrollpane
         JScrollPane hScrollPane = new JScrollPane(hList);

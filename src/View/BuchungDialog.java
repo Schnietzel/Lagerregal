@@ -11,12 +11,14 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
 
-public class BuchungDialog extends JDialog {
+public class BuchungDialog extends JDialog implements Observer {
 	
     private JPanel rootPanel;
-    private JButton okButton;
+    public ObservableButton okButton;
     private JButton cancelButton;
     private JSlider prozentSlider;
     private JTextField prozentTextField;
@@ -34,7 +36,7 @@ public class BuchungDialog extends JDialog {
     {
     	this.lager = info;
     	this.prozent = 0.0;
-    	this.bereitsVerteilt = 0;
+    	this.bereitsVerteilt = ControllerSingleton.getBVInstance().getVerteilteMenge();
     	this.zuVerteilen = zuVerteilen;
     	initGUI();
     	
@@ -101,9 +103,9 @@ public class BuchungDialog extends JDialog {
         cancelButton.setText("Abbrechen");
     	buttonPanelLeft.add(cancelButton);
       
-    	okButton = new JButton();
-    	okButton.setText("Bestätigen");
-    	buttonPanelRight.add(okButton);
+    	okButton = new ObservableButton();
+    	okButton.getButton().setText("Bestätigen");
+    	buttonPanelRight.add(okButton.getButton());
 
         buttonPanelMain.add(buttonPanelLeft);
         buttonPanelMain.add(buttonPanelRight);
@@ -111,7 +113,7 @@ public class BuchungDialog extends JDialog {
     }
     
     private void createListener() {
-        okButton.addActionListener(new ActionListener() {
+        okButton.getButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -126,12 +128,13 @@ public class BuchungDialog extends JDialog {
         prozentSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
+            	int tmp;
                 if (!supsupressSliderChange) {
                     prozentTextField.setText(String.valueOf(prozentSlider.getValue()));
                     prozent = Double.valueOf(prozentTextField.getText());
                 } else supsupressSliderChange = false;
-                bereitsVerteilt = (int) (zuVerteilen * (prozent/100));
-                verteiltLabel.setText(bereitsVerteilt + "/" + zuVerteilen + " verteilt.");
+                tmp = (int) (zuVerteilen * (prozent/100));
+                verteiltLabel.setText(bereitsVerteilt+tmp + "/" + zuVerteilen + " verteilt.");
             }
         });
         prozentTextField.addActionListener(new ActionListener() {
@@ -146,8 +149,11 @@ public class BuchungDialog extends JDialog {
         //TODO: Wert an Control übergeben, Lager "disablen"
     	
         //prozent ist der wert (werte von 0,00-100,00)
-    	System.out.println(prozent);
     	ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, prozent);
+    	okButton.setChanged();
+    	okButton.notifyObservers();
+    	
+    	
 
         dispose();
     }
@@ -204,4 +210,10 @@ public class BuchungDialog extends JDialog {
     {
     	return prozent;
     }
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		 
+		
+	}
 }

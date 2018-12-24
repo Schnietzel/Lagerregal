@@ -13,24 +13,32 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Observable;
+import java.util.Observer;
 
 class LieferungTab extends JPanel {
 
     private JTextField lEingabeFeld;
     private int lEingabeInt;
-    private ObserverLabel lLabel;
+    private JLabel lLieferung;
+    private ObserverLabel lVerteilt;
+    private JLabel lSlash;
+    private JLabel lGesamt;
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
     private JButton lieferungDist;
-    private JButton lieferungConfirm;
+    private ObservableButton lieferungConfirm;
     private JList<Lager> lList;
     private JButton undoButton;
     private JButton redoButton;
 
     private boolean lieferungAktiv = false;
 
+    
     LieferungTab(){
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -72,11 +80,12 @@ class LieferungTab extends JPanel {
         //lieferungDist.setPreferredSize(new Dimension(200,30));
         lButtonPanel.add(lieferungDist);
 
-        lieferungConfirm = new JButton();
-        lieferungConfirm.setText("Lieferung bestätigen");
+        lieferungConfirm = new ObservableButton();
+        lieferungConfirm.getButton().setText("Lieferung bestätigen");
         //lieferungConfirm.setPreferredSize(new Dimension(150,30));
-        lieferungConfirm.setEnabled(false);
-        lButtonPanel.add(lieferungConfirm);
+        lieferungConfirm.getButton().setEnabled(false);
+        lieferungConfirm.addObserver(HistorieTab.hList);
+        lButtonPanel.add(lieferungConfirm.getButton());
 
         lEingabePanel.add(lButtonPanel);
 
@@ -100,9 +109,21 @@ class LieferungTab extends JPanel {
         JPanel lBearbPanelLeft = new JPanel(new FlowLayout(FlowLayout.LEADING));
         JPanel lBearbPanelRight = new JPanel(new FlowLayout(FlowLayout.TRAILING));
 
-        lLabel = new ObserverLabel();
-        lLabel.setText("0/0 verteilt.");
-        lBearbPanelLeft.add(lLabel);
+        lLieferung = new JLabel();
+        lLieferung.setText("Lieferung:");
+        lBearbPanelLeft.add(lLieferung); 
+        
+        lVerteilt = new ObserverLabel();
+        lVerteilt.setText("0");
+        lBearbPanelLeft.add(lVerteilt); 
+        
+        lSlash = new JLabel();
+        lSlash.setText("/");
+        lBearbPanelLeft.add(lSlash); 
+        
+        lGesamt = new JLabel();
+        lGesamt.setText("0");
+        lBearbPanelLeft.add(lGesamt); 
 
         undoButton = new JButton();
         undoButton.setText("Undo");
@@ -127,8 +148,8 @@ class LieferungTab extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if (rbEinlieferung.isSelected()) {
-                    lTextEdit("Einlieferung");
-                } else lTextEdit("Auslieferung");
+                    lLieferung.setText("Einlieferung");
+                } else lLieferung.setText("Auslieferung");
             }
         });
         // Lieferung verteilen
@@ -138,8 +159,9 @@ class LieferungTab extends JPanel {
                 // TODO: Exception Handling
                 lEingabeInt = Integer.parseInt(lEingabeFeld.getText());
                 if (rbEinlieferung.isSelected()) {
-                    lTextEdit("Einlieferung", 0, lEingabeInt);
-                } else lTextEdit("Auslieferung", 0, lEingabeInt);
+                	System.out.println(ControllerSingleton.getBVInstance().getVerteilteMenge());
+                    lTextEdit("Einlieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
+                } else lTextEdit("Auslieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
             
                 boolean gueltig = ControllerSingleton.getBVInstance().createLieferung(rbAuslieferung.isSelected(), lEingabeInt);
 
@@ -149,6 +171,40 @@ class LieferungTab extends JPanel {
                     lUngueltigeZahl();
             }
         });
+        
+        
+        lEingabeFeld.addKeyListener(new KeyListener() {
+        	
+        	String ziffer;
+
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				ziffer = lEingabeFeld.getText();
+				lGesamt.setText(ziffer);
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				
+			}});
+//        lEingabeFeld.addActionListener(new ActionListener(){
+//
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//			lGesamt.setText( lEingabeFeld.getText());
+//				
+//			}});
 
         // Lieferungen-Lager-Liste
         //Event: Doppelklick auf Item in der Liste, Item muss anschließend via Control bearbeitet werden.
@@ -172,6 +228,9 @@ class LieferungTab extends JPanel {
                     }
 
                     BuchungDialog bd = new BuchungDialog(lager, rbAuslieferung.isSelected(), lEingabeInt);
+                    bd.okButton.addObserver(lVerteilt);
+                  
+                    
                     
 //                    boolean gueltig = Buchungsverwaltung.createBuchung(rbAuslieferung.isSelected(), bd.getLager(), bd.getProzent());
 //                    if (gueltig)
@@ -184,15 +243,21 @@ class LieferungTab extends JPanel {
         });
 
         // Lieferung Bestätigen
-        lieferungConfirm.addActionListener(new ActionListener() {
+        lieferungConfirm.getButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
                 boolean gueltig = ControllerSingleton.getBVInstance().verteileLieferung(rbAuslieferung.isSelected());
-                if (gueltig)
+                if (gueltig) {
                     lGueltigeLieferung();
-                else
-                    lUngueltigeLieferung();
+                    lieferungConfirm.setChanged();
+                    lieferungConfirm.notifyObservers();
+                	lVerteilt.setText("0");
+                	lEingabeFeld.setText("");
+                	lGesamt.setText("0");
+                	}
+                else {
+                    lUngueltigeLieferung();}
             }
         });
         // Undo
@@ -212,17 +277,20 @@ class LieferungTab extends JPanel {
         });
     }
 
-    private void lTextEdit(String lieferung) {
-        lLabel.setText(lieferung + ": " + "Zahl" + "/" + lEingabeFeld.getText()+ " verteilt.");
-        //TODO: infoText nach Buchung anpassen (muss nach jeder Buchung, jedem schließen des Dialogs, ausgeführt werden)
-        //Schema des Texts:
-        //Einlieferung: xxxx/xxxx verteilt.
-        //Auslieferung: xxxx/xxxx verteilt.
-
-    }
+//    private void lTextEdit(String lieferung) {
+//        lLabel.setText(lieferung + ": " + "Zahl" + "/" + lEingabeFeld.getText()+ " verteilt.");
+//        //TODO: infoText nach Buchung anpassen (muss nach jeder Buchung, jedem schließen des Dialogs, ausgeführt werden)
+//        //Schema des Texts:
+//        //Einlieferung: xxxx/xxxx verteilt.
+//        //Auslieferung: xxxx/xxxx verteilt.
+//    	
+//
+//    }
     
     private void lTextEdit(String lieferung, int zahl, int gesamt) {
-        lLabel.setText(lieferung + ": " + zahl + "/" + gesamt+ " verteilt.");
+        lLieferung.setText(lieferung);
+        lVerteilt.setText(String.valueOf(zahl));
+        lGesamt.setText(String.valueOf(gesamt));
         //TODO: infoText nach Buchung anpassen (muss nach jeder Buchung, jedem schließen des Dialogs, ausgeführt werden)
         //Schema des Texts:
         //Einlieferung: xxxx/xxxx verteilt.
@@ -263,7 +331,9 @@ class LieferungTab extends JPanel {
         lList.setEnabled(aktiv);
         rbEinlieferung.setEnabled(!aktiv);
         rbAuslieferung.setEnabled(!aktiv);
-        lieferungConfirm.setEnabled(aktiv);
+        lieferungConfirm.getButton().setEnabled(aktiv);
     }
+
+
 
 }

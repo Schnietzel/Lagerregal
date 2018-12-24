@@ -5,13 +5,18 @@ import java.util.Observer;
 
 import javax.swing.JLabel;
 
-public class ObserverLabel extends JLabel implements Observer
-{
+import Controller.ControllerSingleton;
+
+public class ObserverLabel extends JLabel implements Observer{
 
 	@Override
-	public void update(Observable o, Object arg) {
+	public void update(Observable arg0, Object arg1) {
 		// TODO Auto-generated method stub
 		
+		this.setText(String.valueOf(ControllerSingleton.getBVInstance().getVerteilteMenge()));
+		
 	}
+	
+	
 
 }

@@ -8,4 +8,10 @@ public class Zulieferung extends Lieferung
 	{
 		super(gesamtmenge);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "Zulieferung vom " + super.getTimestamp() + " über " + super.getGesamtmenge() + " Artikel";
+	}
 }

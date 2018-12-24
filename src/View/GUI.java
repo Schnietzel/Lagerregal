@@ -42,6 +42,7 @@ public class GUI extends JFrame implements WindowListener {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         GUI gui = new GUI();
+        
     }
 
     public GUI() {

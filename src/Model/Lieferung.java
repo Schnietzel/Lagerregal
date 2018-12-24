@@ -3,8 +3,9 @@ package Model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Observable;
 
-public class Lieferung implements Serializable
+public class Lieferung extends Observable implements Serializable
 {
 	private Date timestamp;
 	private ArrayList<Buchung> buchungen;
@@ -15,11 +16,15 @@ public class Lieferung implements Serializable
 		this.gesamtmenge = gesamtmenge;
 		this.buchungen = new ArrayList<Buchung>();
 		timestamp = new Date();
+		this.setChanged();
+		this.notifyObservers(this);
 	}
 	
 	public void addBuchung(Buchung buchung)
 	{
 		buchungen.add(buchung);
+		this.setChanged();
+		this.notifyObservers();
 	}
 	
 	public String getTimestamp()

@@ -12,6 +12,7 @@ public class Auslieferung extends Lieferung
 	@Override
 	public String toString()
 	{
+		System.out.println("Auslieferung toString");
 		return "Auslieferung vom " + super.getTimestamp() + " über " + super.getGesamtmenge() + " Artikel";
 	}
 }

@@ -143,7 +143,7 @@ public class Buchungsverwaltung
 			return false;
 		}
 		
-		aktuelleLieferung = new Lieferung(gesamtmenge);
+		aktuelleLieferung = LieferungFactory.CreateAuslieferung(gesamtmenge);
 		restMenge = gesamtmenge;
 		return true;
 	}

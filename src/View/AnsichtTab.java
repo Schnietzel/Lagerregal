@@ -23,9 +23,21 @@ class AnsichtTab extends JPanel {
     JTextField aTbKapazitaet;
     JButton aSpeichern;
 
+    JPopupMenu popupMenu;
+    JMenuItem menuItemAdd;
+    JMenuItem menuItemDelete;
+
     AnsichtTab() {
         gt = ControllerSingleton.getGTInstance();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        //PopUpMenu für Liste erstellen
+        popupMenu = new JPopupMenu();
+        menuItemAdd = new JMenuItem("Lager hinzufügen...");
+        menuItemDelete = new JMenuItem("Lager löschen...");
+        popupMenu.add(menuItemAdd);
+        popupMenu.add(menuItemDelete);
+
 
         //Panel für die Liste erstellen
         //Tabellenkram
@@ -71,6 +83,7 @@ class AnsichtTab extends JPanel {
         aSpeichern.setEnabled(false);
         aSpeichern.setText("Änderungen übernehmen");
         aBearbPanel.add(aSpeichern);
+
         //Panels in Ansicht
         this.add(aListePanel);
         this.add(aBearbPanel);
@@ -78,24 +91,48 @@ class AnsichtTab extends JPanel {
     }
 
     private void createListener() {
+        //MenuItem Listener
+        menuItemAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO: Unterlager hinzufügen.
+                System.out.println("HIER WIRD HINZUGEFÜGT");
+            }
+        });
+        menuItemDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO: LAger löschbar? ausgwähltes Lager löschen
+                System.out.println("HIER WIRD GELÖSCHT");
+            }
+        });
         //TODO: Lager-Ansicht: Problem, klick mal was an und halt maustaste gedrückt, dann auf ein anderes ziehen
         //- erster klick wird nur genommen...
         aList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                //Disabled bis das erste Lager ausgwählt wurde
-                aTbName.setEnabled(true);
-                aSpeichern.setEnabled(true);
-                Lager selected = (Lager) aList.getSelectedValue();
+                //Linksklick
+                if(e.getButton() == MouseEvent.BUTTON1) {
+                    //Disabled bis das erste Lager ausgwählt wurde
+                    aTbName.setEnabled(true);
+                    aSpeichern.setEnabled(true);
+                    Lager selected = (Lager) aList.getSelectedValue();
 
-                aTbName.setText(selected.getName());
-                aTbKapazitaet.setText("" + selected.getKapazitaet());
+                    aTbName.setText(selected.getName());
+                    aTbKapazitaet.setText("" + selected.getKapazitaet());
 
-                aTbKapazitaet.setEnabled(selected.getUnterlager().isEmpty());
-
+                    aTbKapazitaet.setEnabled(selected.getUnterlager().isEmpty());
+                }
+                //Rechtsklick
+                if(e.getButton() == MouseEvent.BUTTON3) {
+                    //Rechtsklick Dings wird aufgerufen
+                    //TODO: ausgwähltes Lager zwsichenspeichern oder so
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
             }
-        });
 
+        }
+        );
         // Lager-Änderung speichern
         aSpeichern.addActionListener(new ActionListener() {
             @Override

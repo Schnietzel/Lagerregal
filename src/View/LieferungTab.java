@@ -1,10 +1,7 @@
 package View;
 
-import Controller.Buchungsverwaltung;
 import Controller.ControllerSingleton;
 import Controller.GUITools;
-import Controller.Lagerverwaltung;
-import Controller.ControllerSingleton;
 import Model.Lager;
 
 import javax.swing.*;
@@ -17,8 +14,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Observable;
-import java.util.Observer;
 
 class LieferungTab extends JPanel {
 
@@ -38,8 +33,8 @@ class LieferungTab extends JPanel {
 
     private boolean lieferungAktiv = false;
 
-    
-    LieferungTab(){
+
+    LieferungTab() {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         //EingabePanel
@@ -111,19 +106,19 @@ class LieferungTab extends JPanel {
 
         lLieferung = new JLabel();
         lLieferung.setText("Lieferung:");
-        lBearbPanelLeft.add(lLieferung); 
-        
+        lBearbPanelLeft.add(lLieferung);
+
         lVerteilt = new ObserverLabel();
         lVerteilt.setText("0");
-        lBearbPanelLeft.add(lVerteilt); 
-        
+        lBearbPanelLeft.add(lVerteilt);
+
         lSlash = new JLabel();
         lSlash.setText("/");
-        lBearbPanelLeft.add(lSlash); 
-        
+        lBearbPanelLeft.add(lSlash);
+
         lGesamt = new JLabel();
         lGesamt.setText("0");
-        lBearbPanelLeft.add(lGesamt); 
+        lBearbPanelLeft.add(lGesamt);
 
         undoButton = new JButton();
         undoButton.setText("Undo");
@@ -142,7 +137,7 @@ class LieferungTab extends JPanel {
         this.createListener();
     }
 
-    private void createListener(){
+    private void createListener() {
         // RadioButtons
         rbEinlieferung.addChangeListener(new ChangeListener() {
             @Override
@@ -159,10 +154,10 @@ class LieferungTab extends JPanel {
                 // TODO: Exception Handling
                 lEingabeInt = Integer.parseInt(lEingabeFeld.getText());
                 if (rbEinlieferung.isSelected()) {
-                	System.out.println(ControllerSingleton.getBVInstance().getVerteilteMenge());
+                    System.out.println(ControllerSingleton.getBVInstance().getVerteilteMenge());
                     lTextEdit("Einlieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
                 } else lTextEdit("Auslieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
-            
+
                 boolean gueltig = ControllerSingleton.getBVInstance().createLieferung(rbAuslieferung.isSelected(), lEingabeInt);
 
                 if (gueltig)
@@ -171,33 +166,33 @@ class LieferungTab extends JPanel {
                     lUngueltigeZahl();
             }
         });
-        
-        
+
+
         lEingabeFeld.addKeyListener(new KeyListener() {
-        	
-        	String ziffer;
 
-			@Override
-			public void keyPressed(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-				
-				
-			}
+            String ziffer;
 
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				ziffer = lEingabeFeld.getText();
-				lGesamt.setText(ziffer);
-			}
+            @Override
+            public void keyPressed(KeyEvent arg0) {
+                // TODO Auto-generated method stub
 
-			@Override
-			public void keyTyped(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
-				
-			}});
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent arg0) {
+                // TODO Auto-generated method stub
+                ziffer = lEingabeFeld.getText();
+                lGesamt.setText(ziffer);
+            }
+
+            @Override
+            public void keyTyped(KeyEvent arg0) {
+                // TODO Auto-generated method stub
+
+
+            }
+        });
 //        lEingabeFeld.addActionListener(new ActionListener(){
 //
 //			@Override
@@ -212,26 +207,22 @@ class LieferungTab extends JPanel {
         lList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2)
-                {
+                if (e.getClickCount() == 2) {
                     // TODO: Buchung Handlen
                     Lager lager = lList.getSelectedValue();
-                    if (ControllerSingleton.getBVInstance().istBearbeitet(lager))
-                    {
+                    if (ControllerSingleton.getBVInstance().istBearbeitet(lager)) {
                         JOptionPane.showMessageDialog(null, "Lager ist bereits bearbeitet! (Ggf. Undo benutzen)");
                         return;
                     }
-                    if (!lager.getUnterlager().isEmpty())
-                    {
+                    if (!lager.getUnterlager().isEmpty()) {
                         JOptionPane.showMessageDialog(null, "Lager ist Oberlager und kann damit nicht zur Buchung verwendet werden!");
                         return;
                     }
 
                     BuchungDialog bd = new BuchungDialog(lager, rbAuslieferung.isSelected(), lEingabeInt);
                     bd.okButton.addObserver(lVerteilt);
-                  
-                    
-                    
+
+
 //                    boolean gueltig = Buchungsverwaltung.createBuchung(rbAuslieferung.isSelected(), bd.getLager(), bd.getProzent());
 //                    if (gueltig)
 //                        lGueltigeBuchungsZahl();
@@ -252,12 +243,12 @@ class LieferungTab extends JPanel {
                     lGueltigeLieferung();
                     lieferungConfirm.setChanged();
                     lieferungConfirm.notifyObservers();
-                	lVerteilt.setText("0");
-                	lEingabeFeld.setText("");
-                	lGesamt.setText("0");
-                	}
-                else {
-                    lUngueltigeLieferung();}
+                    lVerteilt.setText("0");
+                    lEingabeFeld.setText("");
+                    lGesamt.setText("0");
+                } else {
+                    lUngueltigeLieferung();
+                }
             }
         });
         // Undo
@@ -277,41 +268,23 @@ class LieferungTab extends JPanel {
         });
     }
 
-//    private void lTextEdit(String lieferung) {
-//        lLabel.setText(lieferung + ": " + "Zahl" + "/" + lEingabeFeld.getText()+ " verteilt.");
-//        //TODO: infoText nach Buchung anpassen (muss nach jeder Buchung, jedem schließen des Dialogs, ausgeführt werden)
-//        //Schema des Texts:
-//        //Einlieferung: xxxx/xxxx verteilt.
-//        //Auslieferung: xxxx/xxxx verteilt.
-//    	
-//
-//    }
-    
     private void lTextEdit(String lieferung, int zahl, int gesamt) {
         lLieferung.setText(lieferung);
         lVerteilt.setText(String.valueOf(zahl));
         lGesamt.setText(String.valueOf(gesamt));
-        //TODO: infoText nach Buchung anpassen (muss nach jeder Buchung, jedem schließen des Dialogs, ausgeführt werden)
-        //Schema des Texts:
-        //Einlieferung: xxxx/xxxx verteilt.
-        //Auslieferung: xxxx/xxxx verteilt.
-
     }
-    
-    private void lGueltigeLieferungsZahl()
-    {
+
+    private void lGueltigeLieferungsZahl() {
         setLieferungAktiv(true);
     }
 
-    private void lGueltigeBuchungsZahl()
-    {
+    private void lGueltigeBuchungsZahl() {
         // TODO: Irgendwie in Liste bemerkbar machen
-    	
-    	
+
+
     }
 
-    private void lGueltigeLieferung()
-    {
+    private void lGueltigeLieferung() {
         setLieferungAktiv(false);
     }
 
@@ -319,13 +292,11 @@ class LieferungTab extends JPanel {
         JOptionPane.showMessageDialog(null, "Lagermenge/Kapazität ist nicht ausreichend für diese Buchung");
     }
 
-    private void lUngueltigeLieferung()
-    {
+    private void lUngueltigeLieferung() {
         JOptionPane.showMessageDialog(null, "Es sind noch Artikel nicht verbucht!");
     }
 
-    private void setLieferungAktiv(boolean aktiv)
-    {
+    private void setLieferungAktiv(boolean aktiv) {
         lieferungDist.setEnabled(!aktiv);
         lEingabeFeld.setEnabled(!aktiv);
         lList.setEnabled(aktiv);
@@ -333,7 +304,6 @@ class LieferungTab extends JPanel {
         rbAuslieferung.setEnabled(!aktiv);
         lieferungConfirm.getButton().setEnabled(aktiv);
     }
-
 
 
 }

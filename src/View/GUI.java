@@ -42,7 +42,7 @@ public class GUI extends JFrame implements WindowListener {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         GUI gui = new GUI();
-        
+
     }
 
     public GUI() {
@@ -66,17 +66,17 @@ public class GUI extends JFrame implements WindowListener {
 
         tabs = new JTabbedPane();
         rootPanel.add(tabs);
-        
+
         AnsichtTab aTab = new AnsichtTab();
         LieferungTab lTab = new LieferungTab();
         HistorieTab hTab = new HistorieTab();
-        
+
         tabs.addTab("Lageransicht", aTab);
         tabs.addTab("Lieferung", lTab);
         tabs.addTab("Historie", hTab);
-        
+
         this.setPreferredSize(new Dimension(450, 500));
-        
+
         addWindowListener(this);
     }
 
@@ -182,27 +182,32 @@ public class GUI extends JFrame implements WindowListener {
     }
 
     @Override
-    public void windowClosing(WindowEvent e) 
-    {
-    	lv.close();
-    	bv.close();
+    public void windowClosing(WindowEvent e) {
+        lv.close();
+        bv.close();
     }
 
-	@Override
-	public void windowActivated(WindowEvent arg0) { }
+    @Override
+    public void windowActivated(WindowEvent arg0) {
+    }
 
-	@Override
-	public void windowClosed(WindowEvent arg0) { }
+    @Override
+    public void windowClosed(WindowEvent arg0) {
+    }
 
-	@Override
-	public void windowDeactivated(WindowEvent arg0) { }
+    @Override
+    public void windowDeactivated(WindowEvent arg0) {
+    }
 
-	@Override
-	public void windowDeiconified(WindowEvent arg0) { }
+    @Override
+    public void windowDeiconified(WindowEvent arg0) {
+    }
 
-	@Override
-	public void windowIconified(WindowEvent arg0) { }
+    @Override
+    public void windowIconified(WindowEvent arg0) {
+    }
 
-	@Override
-	public void windowOpened(WindowEvent arg0) { }
+    @Override
+    public void windowOpened(WindowEvent arg0) {
+    }
 }

@@ -12,23 +12,20 @@ import Model.Buchung;
 import Model.Lieferung;
 
 public class ObserverJList extends JList implements Observer {
-	
 
 
-	@Override
-	public void update(Observable arg0, Object arg1) {
-		// TODO Auto-generated method stub
-		ArrayList<Lieferung> historie = ControllerSingleton.getBVInstance().getHistorie();
-		DefaultListModel dlm = new DefaultListModel();
-		for (Lieferung l : historie)
-        {
-        	dlm.addElement(l.toString());
-        	for (Buchung b : l.getBuchungen())
-        	{
-        		dlm.addElement(b.toString());
-        	}
+    @Override
+    public void update(Observable arg0, Object arg1) {
+        // TODO Auto-generated method stub
+        ArrayList<Lieferung> historie = ControllerSingleton.getBVInstance().getHistorie();
+        DefaultListModel dlm = new DefaultListModel();
+        for (Lieferung l : historie) {
+            dlm.addElement(l.toString());
+            for (Buchung b : l.getBuchungen()) {
+                dlm.addElement(b.toString());
+            }
         }
-		this.setModel(dlm);
-	}
+        this.setModel(dlm);
+    }
 
 }

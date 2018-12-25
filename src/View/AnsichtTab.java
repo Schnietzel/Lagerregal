@@ -13,8 +13,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-class AnsichtTab extends JPanel{
-	GUITools gt;
+class AnsichtTab extends JPanel {
+    GUITools gt;
     JList aList;
 
     JLabel aName;
@@ -23,9 +23,8 @@ class AnsichtTab extends JPanel{
     JTextField aTbKapazitaet;
     JButton aSpeichern;
 
-    AnsichtTab()
-    {
-    	gt = ControllerSingleton.getGTInstance();
+    AnsichtTab() {
+        gt = ControllerSingleton.getGTInstance();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         //Panel für die Liste erstellen
@@ -54,7 +53,7 @@ class AnsichtTab extends JPanel{
         aTbName = new JTextField();
         //Initiales Disablen
         aTbName.setEnabled(false);
-        aTbName.setPreferredSize(new Dimension(120,19));
+        aTbName.setPreferredSize(new Dimension(120, 19));
         aBearbPanel.add(aTbName);
 
         aKapazitaet = new JLabel();
@@ -64,7 +63,7 @@ class AnsichtTab extends JPanel{
         aTbKapazitaet = new JTextField();
         //Initiales Disablen
         aTbKapazitaet.setEnabled(false);
-        aTbKapazitaet.setPreferredSize(new Dimension(60,19));
+        aTbKapazitaet.setPreferredSize(new Dimension(60, 19));
         aBearbPanel.add(aTbKapazitaet);
 
         //Initiales Disablen
@@ -78,7 +77,7 @@ class AnsichtTab extends JPanel{
         this.createListener();
     }
 
-    private void createListener(){
+    private void createListener() {
         //TODO: Lager-Ansicht: Problem, klick mal was an und halt maustaste gedrückt, dann auf ein anderes ziehen
         //- erster klick wird nur genommen...
         aList.addMouseListener(new MouseAdapter() {

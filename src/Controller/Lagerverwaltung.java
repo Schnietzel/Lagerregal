@@ -73,9 +73,11 @@ public class Lagerverwaltung extends Observable{
     public void addLager() { //Lager auf Oberster Hierachie-Ebene hinzufügen
     	System.out.println("Lager hinzugefügt");
     	lager.add(new Lager("Neues Lager"));
+    	this.setChanged();
+    	this.notifyObservers();
     }
     
-    public void addLager(Lager l) { //Lager auf unter anderem Lager hinzufügen
+    public void addLager(Lager l) { //Lager unter anderem Lager hinzufügen
     	Lager found = null;
     	int tmpBestand = 0;
     	System.out.println(l.getName());
@@ -88,9 +90,8 @@ public class Lagerverwaltung extends Observable{
     	
     	found.addUnterlager(new Lager("neues Lager", tmpBestand, tmpBestand));
     	updateLager();
-    	for(Lager tmp : found.getUnterlager()) {
-    		System.out.println(tmp.getName());
-    	}
+    	this.setChanged();
+    	this.notifyObservers();
     	
     	//searchForName(l.getName(), this.lager).addUnterlager(new Lager("Neues Lager"));    
     }
@@ -107,11 +108,15 @@ public class Lagerverwaltung extends Observable{
     			parent.setKapazitaet(parent.getKapazitaet()-tmpKapazität);
     			parent.removerUnterlager(l);
     			removed = true;
+    			this.setChanged();
+    	    	this.notifyObservers();
     		}
     		else {
     		
     			this.lager.remove(l);
     			removed = true;
+    			this.setChanged();
+    	    	this.notifyObservers();
  
     		}
     	}

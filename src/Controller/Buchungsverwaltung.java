@@ -90,7 +90,7 @@ public class Buchungsverwaltung extends Observable {
 
     public boolean createZubuchung(Lager lager, double prozent) {
         int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
-        if (menge > lager.getKapazitaet() || menge > restMenge) {
+        if ((menge+lager.getBestand()) > lager.getKapazitaet() || menge > restMenge) {
             return false;
         }
 

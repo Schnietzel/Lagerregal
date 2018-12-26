@@ -70,14 +70,53 @@ public class Lagerverwaltung {
     }
     
     public void addLager() { //Lager auf Oberster Hierachie-Ebene hinzufügen
+    	System.out.println("Lager hinzugefügt");
     	lager.add(new Lager("Neues Lager"));
     }
     
     public void addLager(Lager l) { //Lager auf unter anderem Lager hinzufügen
+    	Lager found = null;
+    	int tmpBestand = 0;
     	System.out.println(l.getName());
-    	System.out.println(searchForName(l.getName(), this.lager));
+    	found = searchForName(l.getName(), this.lager, found);
+    	System.out.println("Found = "+ found);
     	
-    	searchForName(l.getName(), this.lager).addUnterlager(new Lager("Neues Lager"));    
+    	if(found.getUnterlager().isEmpty()&&found.getBestand()>0) {
+    		tmpBestand=found.getBestand();
+    	}
+    	
+    	found.addUnterlager(new Lager("neues Lager", tmpBestand, tmpBestand));
+    	updateLager();
+    	for(Lager tmp : found.getUnterlager()) {
+    		System.out.println(tmp.getName());
+    	}
+    	
+    	//searchForName(l.getName(), this.lager).addUnterlager(new Lager("Neues Lager"));    
+    }
+    
+    public boolean removeLager(Lager l) {
+    	Lager parent = null;
+    	int tmpKapazität = l.getKapazitaet();
+    	int tmpBestand = l.getBestand();
+    	boolean removed = false;
+    	if(l.getUnterlager().isEmpty()||l.getBestand()==0) {
+    		if(!this.lager.contains(l)) {
+    			parent = searchForParent(l, this.lager , parent);
+    			parent.setBestand(parent.getBestand()-tmpBestand);
+    			parent.setKapazitaet(parent.getKapazitaet()-tmpKapazität);
+    			parent.removerUnterlager(l);
+    			removed = true;
+    		}
+    		else {
+    		
+    			this.lager.remove(l);
+    			removed = true;
+ 
+    		}
+    	}
+    	
+    	updateLager();
+    	return removed;
     }
 
     private void updateLagerRec(Lager l, int depth) {
@@ -99,36 +138,45 @@ public class Lagerverwaltung {
         }
     }
     
-    public Lager searchForName(String name, ArrayList<Lager> lagerList) {
+    public Lager searchForName(String name, ArrayList<Lager> lagerList, Lager result) {
     	
-    	
-    	    	
+      	    	
     	for(Lager l : lagerList) 
     	{
     		System.out.println(l.getName());
-    		if(!l.getUnterlager().isEmpty()) {
-    			searchForName(name, l.getUnterlager());
-    			System.out.println("Namensvergeleich: "+l.getName()+" = "+ name);
-    			if(l.getName()==name) {
-    				System.out.println("Gefunden");
-    				return l;
-    				
-    			}
+    		if(l.getName() == name) {
+    			System.out.println("gefunden");
+    			
+    			result = l;
     		}
-    		else {
-    			System.out.println("Namensvergeleich: "+l.getName()+" = "+ name);
-    			if(l.getName()==name) {
-    				System.out.println("Gefunden");
-    				return l;
-    				
+    		else if(!l.getUnterlager().isEmpty()&&l.getName()!=name&&result==null) {
+    			
+    			result = searchForName(name, l.getUnterlager(), result);
     		}
-    		
     		
     	}
-    		}
     	
-    	return null;
+    return result;
+    }
     
+    public Lager searchForParent(Lager searched, ArrayList<Lager> lagerList, Lager result) {
+    	for(Lager l : lagerList) 
+    	{
+    		
+    		if(l.getUnterlager().contains(searched)) {
+    			System.out.println("gefunden");
+    			
+    			result = l;
+    		}
+    		else if(!l.getUnterlager().isEmpty()&&!l.getUnterlager().contains(searched)&&result==null) {
+    			
+    			result = searchForParent(searched, l.getUnterlager(), result);
+    		}
+    		
+    	}
+    	
+    return result;
+    	
     }
 
     public void initTestlager() {

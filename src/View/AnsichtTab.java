@@ -150,13 +150,13 @@ class AnsichtTab extends JPanel {
                 Lager selected = aList.getSelectedValue();
                 if (selected == null) {
                     ControllerSingleton.getLVInstance().addLager();
-                    dlm = null;
+                    dlm.clear();
                     gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
                     aList.setModel(dlm);
                 } else {
 
                     ControllerSingleton.getLVInstance().addLager(selected);
-                    dlm = null;
+                    dlm.clear();
                     gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
                     aList.setModel(dlm);
 
@@ -169,6 +169,16 @@ class AnsichtTab extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub //Lager Löschen
+            	Lager selected = aList.getSelectedValue();
+            	if(selected==null) {
+            		//Felhler Meldung
+            	}
+            	else {
+            		ControllerSingleton.getLVInstance().removeLager(selected);
+            		dlm.clear();
+            		gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+            		aList.setModel(dlm);
+            	}
 
             }
         });

@@ -42,7 +42,7 @@ public class Lager implements Serializable {
     public void addUnterlager(Lager lager) {
         if (unterlager.isEmpty()) {
             unterlager.add(lager);
-            lager.addBestand(this.bestand);
+           // lager.addBestand(this.bestand);
 
         } else {
             unterlager.add(lager);
@@ -110,6 +110,11 @@ public class Lager implements Serializable {
     public void setKapazitaet(int kap) {
         this.kapazitaet = kap;
     }
+
+	public void removerUnterlager(Lager l) {
+		// TODO Auto-generated method stub
+		this.unterlager.remove(l);
+	}
     
     
 

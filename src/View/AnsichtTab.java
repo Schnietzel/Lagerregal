@@ -26,6 +26,8 @@ class AnsichtTab extends JPanel {
     JPopupMenu popupMenu;
     JMenuItem menuItemAdd;
     JMenuItem menuItemDelete;
+    
+    DefaultListModel<Lager> dlm = new DefaultListModel<>();
 
     AnsichtTab() {
         gt = ControllerSingleton.getGTInstance();
@@ -43,7 +45,7 @@ class AnsichtTab extends JPanel {
         //Tabellenkram
         JPanel aListePanel = new JPanel(new BorderLayout());
         // TestLager Anzeigen lassen
-        DefaultListModel<Lager> dlm = new DefaultListModel<>();
+      
         gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
         //Liste an JList
         //AnsichtTab
@@ -147,6 +149,37 @@ class AnsichtTab extends JPanel {
                 aList.updateUI();
             }
         });
+        
+        menuItemAdd.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub //Lager Hinzufügen
+				Lager selected = (Lager) aList.getSelectedValue();
+				if(selected == null) {				
+					ControllerSingleton.getLVInstance().addLager();
+					dlm = null;
+					gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+					aList.setModel(dlm);
+					}
+				else {
+					
+				ControllerSingleton.getLVInstance().addLager(selected);
+				dlm = null;
+				gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+				aList.setModel(dlm);
+				
+				}
+			}});
+        
+        menuItemDelete.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub //Lager Löschen
+				
+			}
+		});
     }
 
 }

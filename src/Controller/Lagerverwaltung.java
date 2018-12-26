@@ -68,6 +68,17 @@ public class Lagerverwaltung {
             updateLagerRec(l, 0);
         }
     }
+    
+    public void addLager() { //Lager auf Oberster Hierachie-Ebene hinzufügen
+    	lager.add(new Lager("Neues Lager"));
+    }
+    
+    public void addLager(Lager l) { //Lager auf unter anderem Lager hinzufügen
+    	System.out.println(l.getName());
+    	System.out.println(searchForName(l.getName(), this.lager));
+    	
+    	searchForName(l.getName(), this.lager).addUnterlager(new Lager("Neues Lager"));    
+    }
 
     private void updateLagerRec(Lager l, int depth) {
         l.setEbene(depth);
@@ -86,6 +97,38 @@ public class Lagerverwaltung {
             l.setBestand(bestand);
             l.setKapazitaet(kap);
         }
+    }
+    
+    public Lager searchForName(String name, ArrayList<Lager> lagerList) {
+    	
+    	
+    	    	
+    	for(Lager l : lagerList) 
+    	{
+    		System.out.println(l.getName());
+    		if(!l.getUnterlager().isEmpty()) {
+    			searchForName(name, l.getUnterlager());
+    			System.out.println("Namensvergeleich: "+l.getName()+" = "+ name);
+    			if(l.getName()==name) {
+    				System.out.println("Gefunden");
+    				return l;
+    				
+    			}
+    		}
+    		else {
+    			System.out.println("Namensvergeleich: "+l.getName()+" = "+ name);
+    			if(l.getName()==name) {
+    				System.out.println("Gefunden");
+    				return l;
+    				
+    		}
+    		
+    		
+    	}
+    		}
+    	
+    	return null;
+    
     }
 
     public void initTestlager() {

@@ -14,6 +14,13 @@ public class Lager implements Serializable {
     public Lager() {
         unterlager = new ArrayList<Lager>();
     }
+    
+    public Lager(String name) {
+    	this.name = name;
+    	this.kapazitaet = 0;
+    	this.bestand = 0;
+    	this.unterlager = new ArrayList<Lager>();
+    }
 
     public Lager(String name, int kapazitaet, int bestand) {
         this.name = name;
@@ -103,5 +110,7 @@ public class Lager implements Serializable {
     public void setKapazitaet(int kap) {
         this.kapazitaet = kap;
     }
+    
+    
 
 }

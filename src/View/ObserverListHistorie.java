@@ -11,7 +11,7 @@ import Controller.ControllerSingleton;
 import Model.Buchung;
 import Model.Lieferung;
 
-public class ObserverJList extends JList implements Observer {
+public class ObserverListHistorie extends JList implements Observer {
 
 
     @Override

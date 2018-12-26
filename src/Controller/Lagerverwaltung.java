@@ -185,6 +185,22 @@ public class Lagerverwaltung extends Observable{
     return result;
     	
     }
+    
+    public void removeLagerBestand(Lager l, int menge) {
+    	l.removeBestand(menge);
+    	updateLager();
+    	this.setChanged();
+    	this.notifyObservers();
+    }
+    
+    public void addLagerBestand(Lager l, int menge) {
+    	l.addBestand(menge);
+    	updateLager();
+    	this.setChanged();
+    	this.notifyObservers();
+    }
+    
+    
 
     public void initTestlager() {
         ArrayList<Lager> lNds = new ArrayList<Lager>();

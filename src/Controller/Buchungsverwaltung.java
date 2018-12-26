@@ -112,7 +112,7 @@ public class Buchungsverwaltung {
         System.out.println("Buchungsliste der Aktuelle Lieferung:" + aktuelleLieferung.getBuchungen().size() + " Elemente");
         for (Buchung buchung : aktuelleLieferung.getBuchungen()) {
             int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), buchung.getProzent());
-            buchung.getZiellager().addBestand(menge);
+            ControllerSingleton.getLVInstance().addLagerBestand(buchung.getZiellager(), menge);
         }
 
         lieferungenUndo.push(aktuelleLieferung);
@@ -145,14 +145,15 @@ public class Buchungsverwaltung {
     }
 
     public void verteileAuslieferung() {
-        for (int i = 0; i < buchungenUndo.size(); i++) {
+    	int size = buchungenUndo.size();
+        for (int i = 0; i < size; i++) {
             Buchung buchung = buchungenUndo.pop();
             aktuelleLieferung.addBuchung(buchung);
         }
 
         for (Buchung buchung : aktuelleLieferung.getBuchungen()) {
             int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), buchung.getProzent());
-            buchung.getZiellager().removeBestand(menge);
+            ControllerSingleton.getLVInstance().removeLagerBestand(buchung.getZiellager(), menge);
         }
 
         lieferungenUndo.push(aktuelleLieferung);

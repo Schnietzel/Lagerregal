@@ -14,7 +14,7 @@ import Model.Lieferung;
 import Model.LieferungFactory;
 import Model.Zulieferung;
 
-public class Buchungsverwaltung {
+public class Buchungsverwaltung extends Observable {
     private Lagerverwaltung lv;
     private Dateiverwaltung dv;
 
@@ -131,6 +131,7 @@ public class Buchungsverwaltung {
 
     public boolean createAbbuchung(Lager lager, double prozent) {
         int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
+        System.out.println("Menge der Abbuchung: "+menge);
         if (menge > lager.getBestand() || menge > restMenge) {
             return false;
         }

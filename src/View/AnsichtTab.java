@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 
 class AnsichtTab extends JPanel {
     GUITools gt;
+    JPanel aListePanel;
     JList<Lager> aList;
     private int lastSelected;
 
@@ -42,7 +43,7 @@ class AnsichtTab extends JPanel {
 
         //Panel für die Liste erstellen
         //Tabellenkram
-        JPanel aListePanel = new JPanel(new BorderLayout());
+        aListePanel = new JPanel(new BorderLayout());
         // TestLager Anzeigen lassen
 
         gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
@@ -171,7 +172,7 @@ class AnsichtTab extends JPanel {
                 // TODO Auto-generated method stub //Lager Löschen
             	Lager selected = aList.getSelectedValue();
             	if(selected==null) {
-            		//Felhler Meldung
+            		 JOptionPane.showMessageDialog(aListePanel, "Sie müssen Lager Auswählen, um es zu Löschen.");
             	}
             	else {
             		ControllerSingleton.getLVInstance().removeLager(selected);

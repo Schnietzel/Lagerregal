@@ -3,6 +3,7 @@ package Controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Observable;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -11,7 +12,7 @@ import Model.Lager;
 import Model.Lieferung;
 import View.GUI;
 
-public class Lagerverwaltung {
+public class Lagerverwaltung extends Observable{
     private ArrayList<Lager> lager = new ArrayList<Lager>();
 
     public Lagerverwaltung() {

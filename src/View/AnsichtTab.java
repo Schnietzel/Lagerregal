@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 class AnsichtTab extends JPanel {
     GUITools gt;
     JPanel aListePanel;
-    JList<Lager> aList;
+    ObserverListLagerVerwaltung<Lager> aList;
     private int lastSelected;
 
     JLabel aName;
@@ -49,7 +49,8 @@ class AnsichtTab extends JPanel {
         gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
         //Liste an JList
         //AnsichtTab
-        aList = new JList<>(dlm);
+        aList = new ObserverListLagerVerwaltung<Lager>();
+        aList.setModel(dlm);
         aList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //JList an Scrollpane
         JScrollPane aScrollPane = new JScrollPane(aList);

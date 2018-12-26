@@ -151,22 +151,35 @@ class LieferungTab extends JPanel {
         lieferungDist.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: Exception Handling
-                lEingabeInt = Integer.parseInt(lEingabeFeld.getText());
-                if (rbEinlieferung.isSelected()) {
-                    System.out.println(ControllerSingleton.getBVInstance().getVerteilteMenge());
-                    lTextEdit("Einlieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
-                } else lTextEdit("Auslieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
+                GUITools check = new GUITools();
+                int errorCode = check.LieferungInput(lEingabeFeld.getText());
+                switch (errorCode) {
+                    case 0:
+                        lEingabeInt = Integer.parseInt(lEingabeFeld.getText());
+                        if (rbEinlieferung.isSelected()) {
+                            System.out.println(ControllerSingleton.getBVInstance().getVerteilteMenge());
+                            lTextEdit("Einlieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
+                        } else lTextEdit("Auslieferung", ControllerSingleton.getBVInstance().getVerteilteMenge(), lEingabeInt);
 
-                boolean gueltig = ControllerSingleton.getBVInstance().createLieferung(rbAuslieferung.isSelected(), lEingabeInt);
+                        boolean gueltig = ControllerSingleton.getBVInstance().createLieferung(rbAuslieferung.isSelected(), lEingabeInt);
 
-                if (gueltig)
-                    lGueltigeLieferungsZahl();
-                else
-                    lUngueltigeZahl();
+                        if (gueltig)
+                            lGueltigeLieferungsZahl();
+                        else
+                            lUngueltigeZahl();
+                        break;
+                    case 1:
+                        JOptionPane.showMessageDialog(null, "Die eingegebene Zahl muss zwischen 0 und 2.147.483.647 liegen.", "Fehlercode 1", JOptionPane.INFORMATION_MESSAGE);
+                        break;
+                    case 2:
+                        JOptionPane.showMessageDialog(null, "Bitte nur Zahlen eingeben.", "Fehlercode 2", JOptionPane.INFORMATION_MESSAGE);
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(null, "Es ist ein unerwarteter Fehler aufgetreten.", "Fehlercode 3", JOptionPane.INFORMATION_MESSAGE);
+                        break;
+                }
             }
         });
-
 
         lEingabeFeld.addKeyListener(new KeyListener() {
 
@@ -174,11 +187,7 @@ class LieferungTab extends JPanel {
 
             @Override
             public void keyPressed(KeyEvent arg0) {
-                // TODO Auto-generated method stub
-
-
             }
-
             @Override
             public void keyReleased(KeyEvent arg0) {
                 // TODO Auto-generated method stub
@@ -188,18 +197,8 @@ class LieferungTab extends JPanel {
 
             @Override
             public void keyTyped(KeyEvent arg0) {
-                // TODO Auto-generated method stub
-
-
             }
         });
-//        lEingabeFeld.addActionListener(new ActionListener(){
-//
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//			lGesamt.setText( lEingabeFeld.getText());
-//				
-//			}});
 
         // Lieferungen-Lager-Liste
         //Event: Doppelklick auf Item in der Liste, Item muss anschließend via Control bearbeitet werden.
@@ -211,11 +210,11 @@ class LieferungTab extends JPanel {
                     // TODO: Buchung Handlen
                     Lager lager = lList.getSelectedValue();
                     if (ControllerSingleton.getBVInstance().istBearbeitet(lager)) {
-                        JOptionPane.showMessageDialog(null, "Lager ist bereits bearbeitet! (Ggf. Undo benutzen)");
+                        JOptionPane.showMessageDialog(null, "Lager ist bereits bearbeitet! (Ggf. Undo benutzen)", "Fehler", JOptionPane.INFORMATION_MESSAGE);
                         return;
                     }
                     if (!lager.getUnterlager().isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Lager ist Oberlager und kann damit nicht zur Buchung verwendet werden!");
+                        JOptionPane.showMessageDialog(null, "Lager ist Oberlager und kann damit nicht zur Buchung verwendet werden!", "Fehler", JOptionPane.INFORMATION_MESSAGE);
                         return;
                     }
 
@@ -289,11 +288,11 @@ class LieferungTab extends JPanel {
     }
 
     private void lUngueltigeZahl() {
-        JOptionPane.showMessageDialog(null, "Lagermenge/Kapazität ist nicht ausreichend für diese Buchung");
+        JOptionPane.showMessageDialog(null, "Lagermenge/Kapazität ist nicht ausreichend für diese Buchung", "Fehler", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void lUngueltigeLieferung() {
-        JOptionPane.showMessageDialog(null, "Es sind noch Artikel nicht verbucht!");
+        JOptionPane.showMessageDialog(null, "Es sind noch Artikel nicht verbucht!", "Fehler", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void setLieferungAktiv(boolean aktiv) {

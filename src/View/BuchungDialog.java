@@ -19,13 +19,13 @@ import java.util.ResourceBundle;
 public class BuchungDialog extends JDialog implements Observer {
 
     private JPanel rootPanel;
-    public ObservableButton okButton;
+    ObservableButton okButton;
     private JButton cancelButton;
     private JSlider prozentSlider;
     private JTextField prozentTextField;
     private JLabel lagerLabel;
     private JLabel verteiltLabel;
-    private boolean supsupressSliderChange = false;
+    private boolean supressSliderChange = false;
 
     private Lager lager;
     private boolean auslieferung;
@@ -128,10 +128,10 @@ public class BuchungDialog extends JDialog implements Observer {
             @Override
             public void stateChanged(ChangeEvent e) {
                 int tmp;
-                if (!supsupressSliderChange) {
+                if (!supressSliderChange) {
                     prozentTextField.setText(String.valueOf(prozentSlider.getValue()));
                     prozent = Double.valueOf(prozentTextField.getText());
-                } else supsupressSliderChange = false;
+                } else supressSliderChange = false;
                 tmp = (int) (zuVerteilen * (prozent / 100));
                 verteiltLabel.setText(bereitsVerteilt + tmp + "/" + zuVerteilen + " verteilt.");
             }
@@ -139,7 +139,10 @@ public class BuchungDialog extends JDialog implements Observer {
         prozentTextField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int tmp;
                 prozentTextFieldAction();
+                tmp = (int) (zuVerteilen * (prozent / 100));
+                verteiltLabel.setText(bereitsVerteilt + tmp + "/" + zuVerteilen + " verteilt.");
             }
         });
     }
@@ -147,12 +150,9 @@ public class BuchungDialog extends JDialog implements Observer {
     private void onOK() {
         //TODO: Wert an Control übergeben, Lager "disablen"
 
-        //prozent ist der wert (werte von 0,00-100,00)
         ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, prozent);
         okButton.setChanged();
         okButton.notifyObservers();
-
-
         dispose();
     }
 
@@ -160,32 +160,25 @@ public class BuchungDialog extends JDialog implements Observer {
         //Fenster schließen
         dispose();
     }
-    
+
     private void prozentTextFieldAction() {
         GUITools check = new GUITools();
-        prozentSlider.setValue(Integer.parseInt(prozentTextField.getText()));
         int errorCode = check.BuchungInput(prozentTextField.getText());
-//        //TODO: Fehlerhandling ggf. auslagern
         switch (errorCode) {
             case 0:
-                supsupressSliderChange = true;
+                supressSliderChange = true;
                 prozentSlider.setValue(check.iValue);
                 prozent = check.dValue;
-                System.out.println(prozent);
                 break;
-//            case 1:
-//                popUp.setMeldung("Nur Zahlenbereiche von 0-100.");
-//                popUp.popUp();
-//                break;
-//            case 2:
-//                popUp.setMeldung("Bitte nur Zahlen eingeben.");
-//                popUp.popUp();
-//                break;
-//            default:
-//                popUp.setMeldung("Ein unerwarteter Fehler ist aufgetreten.");
-//                popUp.setTitle("Mertens, das sollte nicht so sein!");
-//                popUp.popUp();
-//                break;
+            case 1:
+                JOptionPane.showMessageDialog(null, "Die eingegebene Zahl muss zwischen 0 und 100 liegen.", "Fehlercode 1", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case 2:
+                JOptionPane.showMessageDialog(null, "Bitte nur Zahlen eingeben.", "Fehlercode 2", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, "Es ist ein unerwarteter Fehler aufgetreten.", "Fehlercode 3", JOptionPane.INFORMATION_MESSAGE);
+                break;
         }
     }
 

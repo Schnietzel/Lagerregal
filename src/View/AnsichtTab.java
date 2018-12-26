@@ -2,7 +2,6 @@ package View;
 
 import Controller.ControllerSingleton;
 import Controller.GUITools;
-import Controller.Lagerverwaltung;
 import Model.Lager;
 
 import javax.swing.*;
@@ -11,11 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 class AnsichtTab extends JPanel {
     GUITools gt;
-    JList aList;
+    JList<Lager> aList;
     private int lastSelected;
 
     JLabel aName;
@@ -27,7 +25,7 @@ class AnsichtTab extends JPanel {
     JPopupMenu popupMenu;
     JMenuItem menuItemAdd;
     JMenuItem menuItemDelete;
-    
+
     DefaultListModel<Lager> dlm = new DefaultListModel<>();
 
     AnsichtTab() {
@@ -46,7 +44,7 @@ class AnsichtTab extends JPanel {
         //Tabellenkram
         JPanel aListePanel = new JPanel(new BorderLayout());
         // TestLager Anzeigen lassen
-      
+
         gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
         //Liste an JList
         //AnsichtTab
@@ -94,61 +92,46 @@ class AnsichtTab extends JPanel {
     }
 
     private void createListener() {
-        //MenuItem Listener
-        menuItemAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO: Unterlager hinzufügen.
-                System.out.println("HIER WIRD HINZUGEFÜGT");
-            }
-        });
-        menuItemDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //TODO: LAger löschbar? ausgwähltes Lager löschen
-                System.out.println("HIER WIRD GELÖSCHT");
-            }
-        });
         //TODO: Lager-Ansicht: Problem, klick mal was an und halt maustaste gedrückt, dann auf ein anderes ziehen
         //- erster klick wird nur genommen...
         aList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                //Linksklick
-                if(e.getButton() == MouseEvent.BUTTON1) {
-                    if(aList.getSelectedIndex() != lastSelected){
-                        //Disabled bis das erste Lager ausgwählt wurde
-                        aTbName.setEnabled(true);
-                        aSpeichern.setEnabled(true);
-                        Lager selected = (Lager) aList.getSelectedValue();
+                                   @Override
+                                   public void mouseClicked(MouseEvent e) {
+                                       //Linksklick
+                                       if (e.getButton() == MouseEvent.BUTTON1) {
+                                           if (aList.getSelectedIndex() != lastSelected) {
+                                               //Disabled bis das erste Lager ausgwählt wurde
+                                               aTbName.setEnabled(true);
+                                               aSpeichern.setEnabled(true);
+                                               Lager selected = aList.getSelectedValue();
 
-                        aTbName.setText(selected.getName());
-                        aTbKapazitaet.setText("" + selected.getKapazitaet());
+                                               aTbName.setText(selected.getName());
+                                               aTbKapazitaet.setText("" + selected.getKapazitaet());
 
-                        aTbKapazitaet.setEnabled(selected.getUnterlager().isEmpty());
-                        //Overwrite lastSelected
-                        lastSelected = aList.getSelectedIndex();
-                        System.out.println(lastSelected);
-                    } else {
-                        aList.clearSelection();
-                        lastSelected = -1;
-                    }
-                }
-                //Rechtsklick
-                if(e.getButton() == MouseEvent.BUTTON3) {
-                    //Rechtsklick Dings wird aufgerufen
-                    //TODO: ausgwähltes Lager zwsichenspeichern oder so
-                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
+                                               aTbKapazitaet.setEnabled(selected.getUnterlager().isEmpty());
+                                               //Overwrite lastSelected
+                                               lastSelected = aList.getSelectedIndex();
+                                               System.out.println(lastSelected);
+                                           } else {
+                                               aList.clearSelection();
+                                               lastSelected = -1;
+                                           }
+                                       }
+                                       //Rechtsklick
+                                       if (e.getButton() == MouseEvent.BUTTON3) {
+                                           //Rechtsklick Dings wird aufgerufen
+                                           //TODO: ausgwähltes Lager zwsichenspeichern oder so - aList.getSelectedIndex() oder lastSelected
+                                           popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                                       }
+                                   }
 
-        }
+                               }
         );
         // Lager-Änderung speichern
         aSpeichern.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Lager selected = (Lager) aList.getSelectedValue();
+                Lager selected = aList.getSelectedValue();
 
                 selected.setName(aTbName.getText());
                 selected.setKapazitaet(Integer.parseInt(aTbKapazitaet.getText()));
@@ -158,37 +141,37 @@ class AnsichtTab extends JPanel {
                 aList.updateUI();
             }
         });
-        
+
         menuItemAdd.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub //Lager Hinzufügen
-				Lager selected = (Lager) aList.getSelectedValue();
-				if(selected == null) {				
-					ControllerSingleton.getLVInstance().addLager();
-					dlm = null;
-					gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
-					aList.setModel(dlm);
-					}
-				else {
-					
-				ControllerSingleton.getLVInstance().addLager(selected);
-				dlm = null;
-				gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
-				aList.setModel(dlm);
-				
-				}
-			}});
-        
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub //Lager Hinzufügen
+                Lager selected = aList.getSelectedValue();
+                if (selected == null) {
+                    ControllerSingleton.getLVInstance().addLager();
+                    dlm = null;
+                    gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+                    aList.setModel(dlm);
+                } else {
+
+                    ControllerSingleton.getLVInstance().addLager(selected);
+                    dlm = null;
+                    gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+                    aList.setModel(dlm);
+
+                }
+            }
+        });
+
         menuItemDelete.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub //Lager Löschen
-				
-			}
-		});
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub //Lager Löschen
+
+            }
+        });
     }
 
 }

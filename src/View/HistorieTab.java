@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 class HistorieTab extends JPanel {
     private GUITools gt;
 
-    public static ObserverListHistorie hList = new ObserverListHistorie();
+    static ObserverListHistorie hList = new ObserverListHistorie();
 
     HistorieTab() {
         gt = ControllerSingleton.getGTInstance();

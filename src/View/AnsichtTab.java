@@ -16,6 +16,7 @@ import java.util.ArrayList;
 class AnsichtTab extends JPanel {
     GUITools gt;
     JList aList;
+    private int lastSelected;
 
     JLabel aName;
     JTextField aTbName;
@@ -115,15 +116,23 @@ class AnsichtTab extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 //Linksklick
                 if(e.getButton() == MouseEvent.BUTTON1) {
-                    //Disabled bis das erste Lager ausgwählt wurde
-                    aTbName.setEnabled(true);
-                    aSpeichern.setEnabled(true);
-                    Lager selected = (Lager) aList.getSelectedValue();
+                    if(aList.getSelectedIndex() != lastSelected){
+                        //Disabled bis das erste Lager ausgwählt wurde
+                        aTbName.setEnabled(true);
+                        aSpeichern.setEnabled(true);
+                        Lager selected = (Lager) aList.getSelectedValue();
 
-                    aTbName.setText(selected.getName());
-                    aTbKapazitaet.setText("" + selected.getKapazitaet());
+                        aTbName.setText(selected.getName());
+                        aTbKapazitaet.setText("" + selected.getKapazitaet());
 
-                    aTbKapazitaet.setEnabled(selected.getUnterlager().isEmpty());
+                        aTbKapazitaet.setEnabled(selected.getUnterlager().isEmpty());
+                        //Overwrite lastSelected
+                        lastSelected = aList.getSelectedIndex();
+                        System.out.println(lastSelected);
+                    } else {
+                        aList.clearSelection();
+                        lastSelected = -1;
+                    }
                 }
                 //Rechtsklick
                 if(e.getButton() == MouseEvent.BUTTON3) {

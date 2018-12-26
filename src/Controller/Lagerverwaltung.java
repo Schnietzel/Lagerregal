@@ -101,7 +101,7 @@ public class Lagerverwaltung extends Observable{
     	int tmpKapazität = l.getKapazitaet();
     	int tmpBestand = l.getBestand();
     	boolean removed = false;
-    	if(l.getUnterlager().isEmpty()||l.getBestand()==0) {
+    	if(l.getUnterlager().isEmpty()&&l.getBestand()==0) {
     		if(!this.lager.contains(l)) {
     			parent = searchForParent(l, this.lager , parent);
     			parent.setBestand(parent.getBestand()-tmpBestand);
@@ -120,6 +120,7 @@ public class Lagerverwaltung extends Observable{
  
     		}
     	}
+    
     	
     	updateLager();
     	return removed;

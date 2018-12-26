@@ -177,10 +177,13 @@ class AnsichtTab extends JPanel {
             		 JOptionPane.showMessageDialog(aListePanel, "Sie müssen Lager Auswählen, um es zu Löschen.");
             	}
             	else {
-            		ControllerSingleton.getLVInstance().removeLager(selected);
-            		dlm.clear();
-            		gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
-            		aList.setModel(dlm);
+            		
+            		if(!ControllerSingleton.getLVInstance().removeLager(selected)) {
+            			JOptionPane.showMessageDialog(aListePanel, "Um ein Lager löschen zu können, darf es keine Unterlager und keinen Bestand mehr haben.");
+            		}
+//            		dlm.clear();
+//            		gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+//            		aList.setModel(dlm);
             	}
 
             }

@@ -176,7 +176,7 @@ public class Buchungsverwaltung {
 
         for (Buchung buchung : aktuelleLieferung.getBuchungen()) {
             int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), buchung.getProzent());
-            buchung.getZiellager().removeBestand(menge);
+            lv.removeLagerBestand(buchung.getZiellager(), menge);
         }
 
         lieferungenUndo.push(aktuelleLieferung);

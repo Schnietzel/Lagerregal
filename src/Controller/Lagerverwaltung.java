@@ -3,6 +3,7 @@ package Controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Observable;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -11,7 +12,7 @@ import Model.Lager;
 import Model.Lieferung;
 import View.GUI;
 
-public class Lagerverwaltung {
+public class Lagerverwaltung extends Observable{
     private Dateiverwaltung dv;			// Singleton-Instanz der Dateiverwaltung
     private ArrayList<Lager> lager;		// Die Liste der Lager auf der Obersten Ebene
     
@@ -93,6 +94,8 @@ public class Lagerverwaltung {
     public void addLager() { 
     	System.out.println("Lager hinzugefügt");
     	lager.add(new Lager("Neues Lager"));
+    	this.setChanged();
+    	this.notifyObservers();
     }
     
     /**
@@ -112,9 +115,8 @@ public class Lagerverwaltung {
     	
     	found.addUnterlager(new Lager("neues Lager", tmpBestand, tmpBestand));
     	updateLager();
-    	for(Lager tmp : found.getUnterlager()) {
-    		System.out.println(tmp.getName());
-    	}
+    	this.setChanged();
+    	this.notifyObservers();
     	
     	//searchForName(l.getName(), this.lager).addUnterlager(new Lager("Neues Lager"));    
     }
@@ -124,21 +126,26 @@ public class Lagerverwaltung {
     	int tmpKapazität = l.getKapazitaet();
     	int tmpBestand = l.getBestand();
     	boolean removed = false;
-    	if(l.getUnterlager().isEmpty()||l.getBestand()==0) {
+    	if(l.getUnterlager().isEmpty()&&l.getBestand()==0) {
     		if(!this.lager.contains(l)) {
     			parent = searchForParent(l, this.lager , parent);
     			parent.setBestand(parent.getBestand()-tmpBestand);
     			parent.setKapazitaet(parent.getKapazitaet()-tmpKapazität);
     			parent.removeUnterlager(l);
     			removed = true;
+    			this.setChanged();
+    	    	this.notifyObservers();
     		}
     		else {
     		
     			this.lager.remove(l);
     			removed = true;
+    			this.setChanged();
+    	    	this.notifyObservers();
  
     		}
     	}
+    
     	
     	updateLager();
     	return removed;
@@ -213,6 +220,22 @@ public class Lagerverwaltung {
     {
     	this.lager = lager;
     }
+    
+    public void removeLagerBestand(Lager l, int menge) {
+    	l.removeBestand(menge);
+    	updateLager();
+    	this.setChanged();
+    	this.notifyObservers();
+    }
+    
+    public void addLagerBestand(Lager l, int menge) {
+    	l.addBestand(menge);
+    	updateLager();
+    	this.setChanged();
+    	this.notifyObservers();
+    }
+    
+    
 
     /**
      * Initialisiert die Lagerliste mit Testlagern

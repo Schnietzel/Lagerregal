@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 
 public class Meldung extends JFrame {
 
-    Meldung(String text, String titel){
+    Meldung(String titel, String text){
         //ist noch ugly
         JPanel rootPanel = new JPanel();
         rootPanel.setLayout(new BoxLayout(rootPanel, BoxLayout.Y_AXIS));
@@ -39,8 +39,5 @@ public class Meldung extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    public static void main(String[] args){
-        Meldung test = new Meldung("TestText","TITEL");
-        test.open();
-    }
+ 
 }

@@ -15,13 +15,13 @@ class HistorieTab extends JPanel {
     private GUITools gt;
 
     static ObserverListHistorie hList = new ObserverListHistorie();
-
+    DefaultListModel<String> dlm = new DefaultListModel<String>();
     HistorieTab() {
         gt = ControllerSingleton.getGTInstance();
         this.setLayout(new BorderLayout());
 
-        DefaultListModel<String> dlm = new DefaultListModel<String>();
-        //gt.getLieferung(ControllerSingleton.getBVInstance().getHistorie(), dlm);
+    
+       gt.getLieferung(ControllerSingleton.getBVInstance().getHistorie(), dlm);
 
 
         hList.setModel(dlm);

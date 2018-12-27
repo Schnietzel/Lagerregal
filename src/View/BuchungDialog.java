@@ -149,14 +149,15 @@ public class BuchungDialog extends JDialog implements Observer {
 
     private void onOK() {
         //TODO: Wert an Control übergeben, Lager "disablen"
-    	ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, prozent);
-             
-   
-        okButton.setChanged();
-        okButton.notifyObservers(); 
-        dispose();
-        
-       
+    	if(ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, prozent)) {
+    		okButton.setChanged();
+    		okButton.notifyObservers(); 
+    		dispose();
+    	}
+    	else {
+    		Meldung m = new Meldung("Fehler","Die Buchung konnte nicht erstellt werden.");
+    		m.open();
+    	}
     }
 
     private void onCancel() {
@@ -174,13 +175,19 @@ public class BuchungDialog extends JDialog implements Observer {
                 prozent = check.dValue;
                 break;
             case 1:
-                JOptionPane.showMessageDialog(null, "Die eingegebene Zahl muss zwischen 0 und 100 liegen.", "Fehlercode 1", JOptionPane.INFORMATION_MESSAGE);
+            	Meldung m1 = new Meldung("Fehler: Zahlenbereich","Die eingegebene Zahl muss zwischen 0 und 100 liegen. (Fehlercode 1)");
+            	m1.open();
+                //JOptionPane.showMessageDialog(null, "Die eingegebene Zahl muss zwischen 0 und 100 liegen.", "Fehlercode 1", JOptionPane.INFORMATION_MESSAGE);
                 break;
             case 2:
-                JOptionPane.showMessageDialog(null, "Bitte nur Zahlen eingeben.", "Fehlercode 2", JOptionPane.INFORMATION_MESSAGE);
+            	Meldung m2 = new Meldung("Fehler: Ungültige Eingabe","Bitte nur Zahlen eingeben. (Fehlercode 2)");
+                m2.open();
+            	//JOptionPane.showMessageDialog(null, "Bitte nur Zahlen eingeben.", "Fehlercode 2", JOptionPane.INFORMATION_MESSAGE);
                 break;
             default:
-                JOptionPane.showMessageDialog(null, "Es ist ein unerwarteter Fehler aufgetreten.", "Fehlercode 3", JOptionPane.INFORMATION_MESSAGE);
+            	Meldung m3 = new Meldung("Fehler","Es ist ein unerwarteter fehler aufgetreten. (Fehelr Code 3)");
+            	m3.open();
+                //JOptionPane.showMessageDialog(null, "Es ist ein unerwarteter Fehler aufgetreten.", "Fehlercode 3", JOptionPane.INFORMATION_MESSAGE);
                 break;
         }
     }

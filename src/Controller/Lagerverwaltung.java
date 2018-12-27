@@ -104,17 +104,19 @@ public class Lagerverwaltung extends Observable{
      * @param lager Das Lager, unter dem das neue Lager hinzugefügt wird
      */
     public void addLager(Lager lager) {
-    	Lager found = null;
+    	//Lager found = null;
     	int tmpBestand = 0;
+    	int tmpKapazität = 0;
     	System.out.println(lager.getName());
-    	found = searchForName(lager.getName(), this.lager, found);
-    	System.out.println("Found = "+ found);
+    	//found = searchForName(lager.getName(), this.lager, found);
+    	//System.out.println("Found = "+;
     	
-    	if(found.getUnterlager().isEmpty()&&found.getBestand()>0) {
-    		tmpBestand=found.getBestand();
+    	if(lager.getUnterlager().isEmpty()&&lager.getKapazitaet()>0) {
+    		tmpBestand=lager.getBestand();
+    		tmpKapazität = lager.getKapazitaet();
     	}
     	
-    	found.addUnterlager(new Lager("neues Lager", tmpBestand, tmpBestand));
+    	lager.addUnterlager(new Lager("neues Lager", tmpKapazität, tmpBestand));
     	updateLager();
     	this.setChanged();
     	this.notifyObservers();
@@ -131,7 +133,11 @@ public class Lagerverwaltung extends Observable{
     		if(!this.lager.contains(l)) {
     			parent = searchForParent(l, this.lager , parent);
     			parent.setBestand(parent.getBestand()-tmpBestand);
+    			if(parent.getUnterlager().size()>1) {
     			parent.setKapazitaet(parent.getKapazitaet()-tmpKapazität);
+    			}else {
+    				parent.setKapazitaet(tmpKapazität);
+    			}
     			parent.removeUnterlager(l);
     			removed = true;
     			this.setChanged();

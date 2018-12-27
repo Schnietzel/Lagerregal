@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 class AnsichtTab extends JPanel {
     GUITools gt;
     JPanel aListePanel;
-    JList<Lager> aList;
+    ObserverListLagerVerwaltung aList;
     private int lastSelected;
 
     JLabel aName;
@@ -49,7 +49,9 @@ class AnsichtTab extends JPanel {
         gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
         //Liste an JList
         //AnsichtTab
-        aList = new JList<>(dlm);
+        aList = new ObserverListLagerVerwaltung();
+        ControllerSingleton.getLVInstance().addObserver(aList);
+        aList.setModel(dlm);
         aList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //JList an Scrollpane
         JScrollPane aScrollPane = new JScrollPane(aList);
@@ -151,15 +153,15 @@ class AnsichtTab extends JPanel {
                 Lager selected = aList.getSelectedValue();
                 if (selected == null) {
                     ControllerSingleton.getLVInstance().addLager();
-                    dlm.clear();
-                    gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
-                    aList.setModel(dlm);
+//                    dlm.clear();
+//                    gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+//                    aList.setModel(dlm);
                 } else {
 
                     ControllerSingleton.getLVInstance().addLager(selected);
-                    dlm.clear();
-                    gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
-                    aList.setModel(dlm);
+//                    dlm.clear();
+//                    gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+//                    aList.setModel(dlm);
 
                 }
             }
@@ -175,10 +177,13 @@ class AnsichtTab extends JPanel {
             		 JOptionPane.showMessageDialog(aListePanel, "Sie müssen Lager Auswählen, um es zu Löschen.");
             	}
             	else {
-            		ControllerSingleton.getLVInstance().removeLager(selected);
-            		dlm.clear();
-            		gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
-            		aList.setModel(dlm);
+            		
+            		if(!ControllerSingleton.getLVInstance().removeLager(selected)) {
+            			JOptionPane.showMessageDialog(aListePanel, "Um ein Lager löschen zu können, darf es keine Unterlager und keinen Bestand mehr haben.");
+            		}
+//            		dlm.clear();
+//            		gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
+//            		aList.setModel(dlm);
             	}
 
             }

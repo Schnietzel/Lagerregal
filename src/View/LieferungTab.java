@@ -27,7 +27,7 @@ class LieferungTab extends JPanel {
     private JRadioButton rbAuslieferung;
     private JButton lieferungDist;
     private ObservableButton lieferungConfirm;
-    private JList<Lager> lList;
+    private ObserverListLagerVerwaltung lList;
     private JButton undoButton;
     private JButton redoButton;
 
@@ -92,7 +92,9 @@ class LieferungTab extends JPanel {
         gt.getLagerRecursive(ControllerSingleton.getLVInstance().getLagerList(), dlm);
 
         //Liste an JList
-        lList = new JList<>(dlm);
+        lList = new ObserverListLagerVerwaltung();
+        ControllerSingleton.getLVInstance().addObserver(lList);
+        lList.setModel(dlm);
         lList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //JList an Scrollpane
         JScrollPane lScrollPane = new JScrollPane(lList);

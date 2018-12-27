@@ -34,7 +34,8 @@ public class Lagerverwaltung extends Observable{
         File file = new File(".lager");
         if (file.exists())
         	lager = dv.ladeLager(file);
-        else
+        
+        if (lager == null || lager.isEmpty())
             initTestlager();
     }
 

@@ -149,15 +149,18 @@ public class BuchungDialog extends JDialog implements Observer {
 
     private void onOK() {
         //TODO: Wert an Control übergeben, Lager "disablen"
-
-        ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, prozent);
+    	ControllerSingleton.getBVInstance().createBuchung(auslieferung, lager, prozent);
+             
+   
         okButton.setChanged();
-        okButton.notifyObservers();
+        okButton.notifyObservers(); 
         dispose();
+        
+       
     }
 
     private void onCancel() {
-        //Fenster schließen
+        
         dispose();
     }
 

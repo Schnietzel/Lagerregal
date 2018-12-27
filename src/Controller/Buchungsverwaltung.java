@@ -14,7 +14,7 @@ import Model.Lieferung;
 import Model.LieferungFactory;
 import Model.Zulieferung;
 
-public class Buchungsverwaltung {
+public class Buchungsverwaltung extends Observable {
     private Lagerverwaltung lv;					// Verweis auf die Instanz der Lagerverwaltung
     private Dateiverwaltung dv;					// Verweis auf die Instanz der Dateiverwaltung
 
@@ -97,7 +97,7 @@ public class Buchungsverwaltung {
      */
     public boolean createZubuchung(Lager lager, double prozent) {
         int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
-        if (menge > lager.getKapazitaet() || menge > restMenge) {
+        if ((menge+lager.getBestand()) > lager.getKapazitaet() || menge > restMenge) {
             return false;
         }
 
@@ -122,7 +122,7 @@ public class Buchungsverwaltung {
         System.out.println("Buchungsliste der Aktuelle Lieferung:" + aktuelleLieferung.getBuchungen().size() + " Elemente");
         for (Buchung buchung : aktuelleLieferung.getBuchungen()) {
             int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), buchung.getProzent());
-            buchung.getZiellager().addBestand(menge);
+            ControllerSingleton.getLVInstance().addLagerBestand(buchung.getZiellager(), menge);
         }
 
         lieferungenUndo.push(aktuelleLieferung);
@@ -152,6 +152,7 @@ public class Buchungsverwaltung {
      */
     public boolean createAbbuchung(Lager lager, double prozent) {
         int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
+        System.out.println("Menge der Abbuchung: "+menge);
         if (menge > lager.getBestand() || menge > restMenge) {
             return false;
         }
@@ -169,14 +170,15 @@ public class Buchungsverwaltung {
      * Schlieﬂt die aktuelle Lieferung ab und verbucht alle Buchungen
      */
     public void verteileAuslieferung() {
-        for (int i = 0; i < buchungenUndo.size(); i++) {
+    	int size = buchungenUndo.size();
+        for (int i = 0; i < size; i++) {
             Buchung buchung = buchungenUndo.pop();
             aktuelleLieferung.addBuchung(buchung);
         }
 
         for (Buchung buchung : aktuelleLieferung.getBuchungen()) {
             int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), buchung.getProzent());
-            lv.removeLagerBestand(buchung.getZiellager(), menge);
+            ControllerSingleton.getLVInstance().removeLagerBestand(buchung.getZiellager(), menge);
         }
 
         lieferungenUndo.push(aktuelleLieferung);

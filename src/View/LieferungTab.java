@@ -257,6 +257,16 @@ class LieferungTab extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: UNDO
+            	
+            	if(lieferungAktiv) {
+            		//Buchungen noch nicht ausgeführt
+            		//Buchung vom Stack nehmen
+            		ControllerSingleton.getBVInstance().undoBuchung();
+            	}
+            	else {
+            		//Lieferung muss Rückgängig gemacht werden
+            		//--> Alle Buchungen umkehren 
+            	}
             }
         });
 
@@ -265,6 +275,12 @@ class LieferungTab extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: REDO
+            	if(lieferungAktiv) {
+            		
+            	}
+            	else {
+            		
+            	}
             }
         });
     }

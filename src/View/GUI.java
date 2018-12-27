@@ -154,7 +154,7 @@ public class GUI extends JFrame implements WindowListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 bv.setHistorie(dv.importHistorie());
-                // TODO: Updaten
+                // TODO: Updaten???
             }
         });
         menuDatei.add(miHistorieImport);

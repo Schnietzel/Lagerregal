@@ -26,12 +26,12 @@ class LieferungTab extends JPanel {
     private JRadioButton rbEinlieferung;
     private JRadioButton rbAuslieferung;
     private JButton lieferungDist;
-    private ObservableButton lieferungConfirm;
+    private JButton lieferungConfirm;
     private ObserverListLagerVerwaltung lList;
     private JButton undoButton;
     private JButton redoButton;
 
-    private boolean lieferungAktiv = false;
+   // private boolean lieferungAktiv = false;
 
 
     LieferungTab() {
@@ -75,12 +75,11 @@ class LieferungTab extends JPanel {
         //lieferungDist.setPreferredSize(new Dimension(200,30));
         lButtonPanel.add(lieferungDist);
 
-        lieferungConfirm = new ObservableButton();
-        lieferungConfirm.getButton().setText("Lieferung bestätigen");
+        lieferungConfirm = new JButton();
+        lieferungConfirm.setText("Lieferung bestätigen");
         //lieferungConfirm.setPreferredSize(new Dimension(150,30));
-        lieferungConfirm.getButton().setEnabled(false);
-        lieferungConfirm.addObserver(HistorieTab.hList);
-        lButtonPanel.add(lieferungConfirm.getButton());
+        lieferungConfirm.setEnabled(false);
+        lButtonPanel.add(lieferungConfirm);
 
         lEingabePanel.add(lButtonPanel);
 
@@ -113,7 +112,9 @@ class LieferungTab extends JPanel {
         lVerteilt = new ObserverLabel();
         lVerteilt.setText("0");
         lBearbPanelLeft.add(lVerteilt);
-
+        ControllerSingleton.getBVInstance().addObserver(lVerteilt);
+        
+        
         lSlash = new JLabel();
         lSlash.setText("/");
         lBearbPanelLeft.add(lSlash);
@@ -174,7 +175,7 @@ class LieferungTab extends JPanel {
                         JOptionPane.showMessageDialog(null, "Die eingegebene Zahl muss zwischen 0 und 2.147.483.647 liegen.", "Fehlercode 1", JOptionPane.INFORMATION_MESSAGE);
                         break;
                     case 2:
-                        JOptionPane.showMessageDialog(null, "Bitte nur Zahlen eingeben.", "Fehlercode 2", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Bitte nur eine Zahl eingeben.", "Fehlercode 2", JOptionPane.INFORMATION_MESSAGE);
                         break;
                     default:
                         JOptionPane.showMessageDialog(null, "Es ist ein unerwarteter Fehler aufgetreten.", "Fehlercode 3", JOptionPane.INFORMATION_MESSAGE);
@@ -235,15 +236,14 @@ class LieferungTab extends JPanel {
         });
 
         // Lieferung Bestätigen
-        lieferungConfirm.getButton().addActionListener(new ActionListener() {
+        lieferungConfirm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //TODO: Lieferung komplett verteilt? - Lieferung ausführen -sicher?
                 boolean gueltig = ControllerSingleton.getBVInstance().verteileLieferung(rbAuslieferung.isSelected());
                 if (gueltig) {
                     lGueltigeLieferung();
-                    lieferungConfirm.setChanged();
-                    lieferungConfirm.notifyObservers();
+                   
                     lVerteilt.setText("0");
                     lEingabeFeld.setText("");
                     lGesamt.setText("0");
@@ -258,12 +258,22 @@ class LieferungTab extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 // TODO: UNDO
             	
-            	if(lieferungAktiv) {
+            	if(ControllerSingleton.getBVInstance().isLieferungAktiv()) {
             		//Buchungen noch nicht ausgeführt
             		//Buchung vom Stack nehmen
             		ControllerSingleton.getBVInstance().undoBuchung();
+            		
+            		//Verteilte Menge muss aktualisiert werden 
+            		
             	}
             	else {
+            		if(ControllerSingleton.getBVInstance().undoLieferung()) {
+            			
+            		}
+            		else {
+            			Meldung m = new Meldung("Fehler","Es befindet sich keine Lieferung auf dem Undo Stack");
+            			m.open();
+            		}
             		//Lieferung muss Rückgängig gemacht werden
             		//--> Alle Buchungen umkehren 
             	}
@@ -275,11 +285,19 @@ class LieferungTab extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO: REDO
-            	if(lieferungAktiv) {
-            		
+            	if(ControllerSingleton.getBVInstance().isLieferungAktiv()) {
+            		//Buchungen vom Redo Stack zurückholen
+            		ControllerSingleton.getBVInstance().redoBuchung();
             	}
             	else {
             		
+            		if(ControllerSingleton.getBVInstance().redoLieferung()) {
+            			
+            		}
+            		else {
+            			Meldung m = new Meldung("Fehler","Es befindet sich keine Lieferung auf dem Redo Stack");
+            			m.open();
+            		}
             	}
             }
         });
@@ -319,7 +337,7 @@ class LieferungTab extends JPanel {
         lList.setEnabled(aktiv);
         rbEinlieferung.setEnabled(!aktiv);
         rbAuslieferung.setEnabled(!aktiv);
-        lieferungConfirm.getButton().setEnabled(aktiv);
+        lieferungConfirm.setEnabled(aktiv);
     }
 
 

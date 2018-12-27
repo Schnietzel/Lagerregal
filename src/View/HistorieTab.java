@@ -17,16 +17,11 @@ class HistorieTab extends JPanel {
     static ObserverListHistorie hList = new ObserverListHistorie();
     DefaultListModel<String> dlm = new DefaultListModel<String>();
     HistorieTab() {
+    	ControllerSingleton.getBVInstance().addObserver(hList);
         gt = ControllerSingleton.getGTInstance();
         this.setLayout(new BorderLayout());
-
-    
-       gt.getLieferung(ControllerSingleton.getBVInstance().getHistorie(), dlm);
-
-
+        gt.getLieferung(ControllerSingleton.getBVInstance().getHistorie(), dlm);
         hList.setModel(dlm);
-
-
         //JList an Scrollpane
         JScrollPane hScrollPane = new JScrollPane(hList);
         //ScrollPane an Panel für Liste

@@ -25,7 +25,7 @@ public class Buchungsverwaltung extends Observable {
     private Stack<Lieferung> lieferungenRedo;	// Redo-Stack für Gesamte Lieferungen
     private ArrayList<Lieferung> historie;		// Liste der gesamten Lieferungen
 
-    private Lieferung aktuelleLieferung;		// Aktuell bearbeitete Lieferung
+    private Lieferung aktuelleLieferung = null;		// Aktuell bearbeitete Lieferung
 
     private int restMenge;						// Restmenge, die noch weiter verbucht werden muss
     int verteilteMenge;							// Menge, die bereits verbucht ist
@@ -36,7 +36,7 @@ public class Buchungsverwaltung extends Observable {
     public Buchungsverwaltung() {
         lv = ControllerSingleton.getLVInstance();
         dv = ControllerSingleton.getDVInstance();
-
+        
         buchungenUndo = new Stack<Buchung>();
         buchungenRedo = new Stack<Buchung>();
 
@@ -50,6 +50,7 @@ public class Buchungsverwaltung extends Observable {
      * Lädt die Historiendatei. 
      * Falls sie nicht existiert, wird eine neue, leere Liste initialisiert.
      */
+    
     private void ladeHistorie() {
         File file = new File(".historie");
         if (file.exists())
@@ -72,6 +73,20 @@ public class Buchungsverwaltung extends Observable {
      */
     public ArrayList<Lieferung> getHistorie() {
         return historie;
+    }
+    
+    /**
+     * Zeigt ob aktuell eine Lieferung bearbeitet wird.
+     * @return true, es wir eine Lieferung verteilt. Die zugehörigen Buchungen liegen noch auf dem Undo Stack und wurden noch nicht ausgeführt.
+     * false, Zurzeit wird keine Lieferung verteilt.
+     */
+    public boolean isLieferungAktiv() {
+    	if(aktuelleLieferung==null) {
+    		return false;
+    	}
+    	else {
+    		return true;
+    	}
     }
 
     /**
@@ -127,6 +142,9 @@ public class Buchungsverwaltung extends Observable {
 
         lieferungenUndo.push(aktuelleLieferung);
         historie.add(aktuelleLieferung);
+        this.setChanged();
+        this.notifyObservers();
+        aktuelleLieferung = null;
     }
 
     /**
@@ -183,13 +201,22 @@ public class Buchungsverwaltung extends Observable {
 
         lieferungenUndo.push(aktuelleLieferung);
         historie.add(aktuelleLieferung);
+        this.setChanged();
+        this.notifyObservers();
+        aktuelleLieferung = null;
     }
 
     /**
      * Setzt letzte Buchung zurück
      */
     public void undoBuchung() {
-        buchungenRedo.push(buchungenUndo.pop());
+    	Buchung undo = buchungenUndo.pop();
+    	int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), undo.getProzent());
+    	verteilteMenge-=menge;
+    	restMenge+=menge;
+    	setChanged();
+    	notifyObservers();
+        buchungenRedo.push(undo);
         // ausgrauen rückgängig machen
     }
 
@@ -197,36 +224,86 @@ public class Buchungsverwaltung extends Observable {
      * Wiederholt letzte Buchung
      */
     public void redoBuchung() {
-        buchungenUndo.push(buchungenRedo.pop());
+    	Buchung redo = buchungenRedo.pop();
+    	int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), redo.getProzent());
+    	verteilteMenge+=menge;
+    	restMenge-=menge;
+    	setChanged();
+    	notifyObservers();
+        buchungenUndo.push(redo);
         // ausgrauen wiederherstellen
     }
 
     /**
      * Setzt letzte Lieferung zurück
      */
-    public void undoLieferung() {
+    public boolean undoLieferung() {
+    	if(!lieferungenUndo.empty()) {
         aktuelleLieferung = lieferungenUndo.pop();
+        int menge = 0;
+        System.out.println(aktuelleLieferung.getClass().getName());
         if (aktuelleLieferung.getClass().equals(Auslieferung.class)) {
-            verteileZulieferung();
+            System.out.println(aktuelleLieferung.getBuchungen().get(0).getClass().getName());
+            for(Buchung ab : aktuelleLieferung.getBuchungen()) {
+            	menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), ab.getProzent());
+            	ControllerSingleton.getLVInstance().addLagerBestand(ab.getZiellager(), menge);
+            }
+            
         } else {
-            verteileAuslieferung();
+        	System.out.println(aktuelleLieferung.getBuchungen().get(0).getClass().getName());
+        	 for(Buchung zb : aktuelleLieferung.getBuchungen()) {
+        		 menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), zb.getProzent());
+        		 ControllerSingleton.getLVInstance().removeLagerBestand(zb.getZiellager(), menge);
+             }
         }
         lieferungenRedo.push(aktuelleLieferung);
         historie.remove(aktuelleLieferung);
+        verteilteMenge=0;
+        restMenge=0;
+        this.setChanged();
+        this.notifyObservers();
+        aktuelleLieferung = null;
+       
+        return true;
+    }
+    	else {
+    		return false;
+    	}
     }
 
     /**
-     * Wiederholt letzte Lieferung
+     * Wiederholt eine zurückgesetzte Lieferung
      */
-    public void redoLieferung() {
+    public boolean redoLieferung() {
+    	if(!lieferungenRedo.empty()) {
+    	int menge = 0;
         aktuelleLieferung = lieferungenRedo.pop();
         if (aktuelleLieferung.getClass().equals(Auslieferung.class)) {
-            verteileZulieferung();
-        } else {
-            verteileAuslieferung();
+        	System.out.println(aktuelleLieferung.getBuchungen().get(0).getClass().getName());
+            for(Buchung ab : aktuelleLieferung.getBuchungen()) {
+            	menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), ab.getProzent());
+            	ControllerSingleton.getLVInstance().removeLagerBestand(ab.getZiellager(), menge);
+            }
+        } 
+        else {
+        	System.out.println(aktuelleLieferung.getBuchungen().get(0).getClass().getName());
+        	for(Buchung zb : aktuelleLieferung.getBuchungen()) {
+       		 menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), zb.getProzent());
+       		 ControllerSingleton.getLVInstance().addLagerBestand(zb.getZiellager(), menge);
+            }
+           
         }
         lieferungenUndo.push(aktuelleLieferung);
         historie.add(aktuelleLieferung);
+        this.setChanged();
+        this.notifyObservers();
+        aktuelleLieferung = null;
+        //Historie aktualisieren
+        return true;
+    	}
+    	else {
+    		return false;
+    	}
     }
 
     /**

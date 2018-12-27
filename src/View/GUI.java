@@ -27,13 +27,21 @@ public class GUI extends JFrame implements WindowListener {
     private JMenuBar menuBar;
     private JMenu menuDatei;
     private JMenuItem miNeu;
-    private JMenuItem miOeffnen;
-    private JMenuItem miSpeichern;
+    private JMenuItem miLagerImport;
+    private JMenuItem miLagerExport;
+    private JMenuItem miHistorieImport;
+    private JMenuItem miHistorieExport;
     private JMenuItem miVirus;
     private JMenu menuEdit;
     private JMenuItem miUndo;
     private JMenuItem miRedo;
 
+    private AnsichtTab aTab;
+    private LieferungTab lTab;
+    private HistorieTab hTab;
+    
+    private static GUI gui;
+    
     public static void main(String[] args) throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException, IOException {
         lv = ControllerSingleton.getLVInstance();
         dv = ControllerSingleton.getDVInstance();
@@ -41,10 +49,15 @@ public class GUI extends JFrame implements WindowListener {
 
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-        GUI gui = new GUI();
+        gui = new GUI();
 
     }
 
+    public static GUI getGUI()
+    {
+    	return gui;
+    }
+    
     public GUI() {
         initGUI();
 
@@ -67,9 +80,9 @@ public class GUI extends JFrame implements WindowListener {
         tabs = new JTabbedPane();
         rootPanel.add(tabs);
 
-        AnsichtTab aTab = new AnsichtTab();
-        LieferungTab lTab = new LieferungTab();
-        HistorieTab hTab = new HistorieTab();
+        aTab = new AnsichtTab();
+        lTab = new LieferungTab();
+        hTab = new HistorieTab();
 
         tabs.addTab("Lageransicht", aTab);
         tabs.addTab("Lieferung", lTab);
@@ -102,36 +115,60 @@ public class GUI extends JFrame implements WindowListener {
         });
         menuDatei.add(miNeu);
         menuDatei.addSeparator();
-
-        miOeffnen = new JMenuItem("Lagerdatei Öffnen",
+        
+        miLagerImport = new JMenuItem("Lagerdatei importieren",
                 KeyEvent.VK_O);
-        miOeffnen.setAccelerator(KeyStroke.getKeyStroke(
+        miLagerImport.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        miOeffnen.getAccessibleContext().setAccessibleDescription(
+        miLagerImport.getAccessibleContext().setAccessibleDescription(
                 "Bestehende Lagerdatei Öffnen");
-        miOeffnen.addActionListener(new ActionListener() {
+        miLagerImport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Bei STRG+O wird geöffnet!!
-                System.out.println("GEOEFFNET");
+                lv.setLagerListe(dv.importLager());
+                lTab.updateUI();
+                // TODO: Updaten
             }
         });
-        menuDatei.add(miOeffnen);
+        menuDatei.add(miLagerImport);
 
-        miSpeichern = new JMenuItem("Lagerdatei Speichern",
+        miLagerExport = new JMenuItem("Lagerdatei exportieren",
                 KeyEvent.VK_S);
-        miSpeichern.setAccelerator(KeyStroke.getKeyStroke(
+        miLagerExport.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-        miSpeichern.getAccessibleContext().setAccessibleDescription(
+        miLagerExport.getAccessibleContext().setAccessibleDescription(
                 "Aktuelles Lagerdatei speichern");
-        miSpeichern.addActionListener(new ActionListener() {
+        miLagerExport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Bei STRG+S wird gespeichert!!
-                System.out.println("GESPEICHERT");
+                dv.exportLager(lv.getLagerList());
             }
         });
-        menuDatei.add(miSpeichern);
+        menuDatei.add(miLagerExport);
+        menuDatei.addSeparator();
+
+        miHistorieImport = new JMenuItem("Historiendatei importieren");
+        miHistorieImport.getAccessibleContext().setAccessibleDescription(
+                "Bestehende Historiendatei importieren");
+        miHistorieImport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                bv.setHistorie(dv.importHistorie());
+                // TODO: Updaten
+            }
+        });
+        menuDatei.add(miHistorieImport);
+
+        miHistorieExport = new JMenuItem("Historiendatei exportieren");
+        miHistorieExport.getAccessibleContext().setAccessibleDescription(
+                "Aktuelle Historie exportieren");
+        miHistorieExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dv.exportHistorie(bv.getHistorie());
+            }
+        });
+        menuDatei.add(miHistorieExport);
         menuDatei.addSeparator();
 
         miVirus = new JMenuItem("Trust me, I'm a dolphin!", KeyEvent.VK_V);
@@ -140,7 +177,7 @@ public class GUI extends JFrame implements WindowListener {
         miVirus.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Hier was lustiges einfallen lassen!
+                // TODO: Hier was lustiges einfallen lassen!
                 System.out.println("Virus wird installiert...");
             }
         });

@@ -15,29 +15,24 @@ import Model.LieferungFactory;
 import Model.Zulieferung;
 
 public class Buchungsverwaltung {
-    private Lagerverwaltung lv;
-    private Dateiverwaltung dv;
+    private Lagerverwaltung lv;					// Verweis auf die Instanz der Lagerverwaltung
+    private Dateiverwaltung dv;					// Verweis auf die Instanz der Dateiverwaltung
 
-    private Stack<Buchung> buchungenUndo;
-    private Stack<Buchung> buchungenRedo;
+    private Stack<Buchung> buchungenUndo;		// Undo-Stack für Buchungen
+    private Stack<Buchung> buchungenRedo;		// Redo-Stack für Buchungen
 
-    private Stack<Lieferung> lieferungenUndo;
-    private Stack<Lieferung> lieferungenRedo;
-    private ArrayList<Lieferung> historie;
+    private Stack<Lieferung> lieferungenUndo;	// Undo-Stack für Gesamte Lieferungen
+    private Stack<Lieferung> lieferungenRedo;	// Redo-Stack für Gesamte Lieferungen
+    private ArrayList<Lieferung> historie;		// Liste der gesamten Lieferungen
 
-    private Lieferung aktuelleLieferung;
+    private Lieferung aktuelleLieferung;		// Aktuell bearbeitete Lieferung
 
-    public Lieferung getAktuelleLieferung() {
-        return aktuelleLieferung;
-    }
+    private int restMenge;						// Restmenge, die noch weiter verbucht werden muss
+    int verteilteMenge;							// Menge, die bereits verbucht ist
 
-    public void setAktuelleLieferung(Lieferung aktuelleLieferung) {
-        this.aktuelleLieferung = aktuelleLieferung;
-    }
-
-    private int restMenge;
-    int verteilteMenge;
-
+    /**
+     * Konstruktor, der alles initialisiert
+     */
     public Buchungsverwaltung() {
         lv = ControllerSingleton.getLVInstance();
         dv = ControllerSingleton.getDVInstance();
@@ -51,33 +46,39 @@ public class Buchungsverwaltung {
         ladeHistorie();
     }
 
+    /**
+     * Lädt die Historiendatei. 
+     * Falls sie nicht existiert, wird eine neue, leere Liste initialisiert.
+     */
     private void ladeHistorie() {
-        // TODO: Datei festlegen, Exceptions und so
-        try {
-            String datei = "C:\\Test\\bla.historie";
-            File file = new File(datei);
-            historie = dv.ladeHistorie(file);
-        } catch (Exception e) {
-            e.printStackTrace();
+        File file = new File(".historie");
+        if (file.exists())
+        	historie = dv.ladeHistorie(file);
+        else
             historie = new ArrayList<Lieferung>();
-        }
     }
 
+    /**
+     * Speichert die Historiendatei. Wird aufgerufen beim Schließen des Programms
+     */
     public void close() {
-        // TODO: Datei festlegen, Exceptions und so
-        try {
-            String datei = "C:\\Test\\bla.historie";
-            File file = new File(datei);
-            dv.speicherHistorie(file, historie);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        File file = new File(".historie");
+        dv.speicherHistorie(file, historie);
     }
 
+    /**
+     * Gibt die aktuelle Historie zurück
+     * @return Die aktuelle Historie
+     */
     public ArrayList<Lieferung> getHistorie() {
         return historie;
     }
 
+    /**
+     * Eröffnet eine neue Zulieferung
+     * @param gesamtmenge Die Menge, die für die Lieferung verbucht werden sollen
+     * @return true, wenn die Lieferung eröffnet wurde, false, wenn die Gesamte Lagerkapazität nicht ausreicht
+     */
     public boolean createZulieferung(int gesamtmenge) {
         if (gesamtmenge > lv.getFreieGesamtlagerkapazität()) {
             return false;
@@ -88,6 +89,12 @@ public class Buchungsverwaltung {
         return true;
     }
 
+    /**
+     * Fügt eine neue Zubuchung zur aktuellen Lieferung hinzu
+     * @param lager Das Lager, zu welchem Artikel gebucht werden sollen
+     * @param prozent Der Prozentsatz der Gesamtmenge, die verbucht werden soll
+     * @return true, wenn die Buchung erstellt wurde, false, wenn die Lagerkapazität nicht ausreicht oder die restmenge nicht ausreicht
+     */
     public boolean createZubuchung(Lager lager, double prozent) {
         int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
         if (menge > lager.getKapazitaet() || menge > restMenge) {
@@ -101,6 +108,9 @@ public class Buchungsverwaltung {
         return true;
     }
 
+    /**
+     * Schließt die aktuelle Lieferung ab und verbucht alle Buchungen
+     */
     public void verteileZulieferung() {
         int size = buchungenUndo.size();
         for (int i = 0; i < size; i++) {
@@ -119,6 +129,11 @@ public class Buchungsverwaltung {
         historie.add(aktuelleLieferung);
     }
 
+    /**
+     * Eröffnet eine neue Auslieferung
+     * @param gesamtmenge Die Menge, die für die Lieferung verbucht werden sollen
+     * @return true, wenn die Lieferung eröffnet wurde, false, wenn der Gesamte Lagerbestand nicht ausreicht
+     */
     public boolean createAuslieferung(int gesamtmenge) {
         if (gesamtmenge > lv.getGesamtbestand()) {
             return false;
@@ -129,6 +144,12 @@ public class Buchungsverwaltung {
         return true;
     }
 
+    /**
+     * Fügt eine neue Abbuchung zur aktuellen Lieferung hinzu
+     * @param lager Das Lager, zu welchem Artikel gebucht werden sollen
+     * @param prozent Der Prozentsatz der Gesamtmenge, die verbucht werden soll
+     * @return true, wenn die Buchung erstellt wurde, false, wenn der Lagerbestand nicht ausreicht oder die restmenge nicht ausreicht
+     */
     public boolean createAbbuchung(Lager lager, double prozent) {
         int menge = getEinzelmenge(aktuelleLieferung.getGesamtmenge(), prozent);
         if (menge > lager.getBestand() || menge > restMenge) {
@@ -144,6 +165,9 @@ public class Buchungsverwaltung {
         return true;
     }
 
+    /**
+     * Schließt die aktuelle Lieferung ab und verbucht alle Buchungen
+     */
     public void verteileAuslieferung() {
         for (int i = 0; i < buchungenUndo.size(); i++) {
             Buchung buchung = buchungenUndo.pop();
@@ -159,16 +183,25 @@ public class Buchungsverwaltung {
         historie.add(aktuelleLieferung);
     }
 
+    /**
+     * Setzt letzte Buchung zurück
+     */
     public void undoBuchung() {
         buchungenRedo.push(buchungenUndo.pop());
         // ausgrauen rückgängig machen
     }
 
+    /**
+     * Wiederholt letzte Buchung
+     */
     public void redoBuchung() {
         buchungenUndo.push(buchungenRedo.pop());
         // ausgrauen wiederherstellen
     }
 
+    /**
+     * Setzt letzte Lieferung zurück
+     */
     public void undoLieferung() {
         aktuelleLieferung = lieferungenUndo.pop();
         if (aktuelleLieferung.getClass().equals(Auslieferung.class)) {
@@ -180,6 +213,9 @@ public class Buchungsverwaltung {
         historie.remove(aktuelleLieferung);
     }
 
+    /**
+     * Wiederholt letzte Lieferung
+     */
     public void redoLieferung() {
         aktuelleLieferung = lieferungenRedo.pop();
         if (aktuelleLieferung.getClass().equals(Auslieferung.class)) {
@@ -191,12 +227,39 @@ public class Buchungsverwaltung {
         historie.add(aktuelleLieferung);
     }
 
+    /**
+     * Gibt aktuelle Lieferung zurück
+     * @return Die aktuelle Lieferung
+     */
+    public Lieferung getAktuelleLieferung() {
+        return aktuelleLieferung;
+    }
+
+    /**
+     * Setzt die aktuelle Lieferung neu
+     * @param aktuelleLieferung die neue Lieferung
+     */
+    public void setAktuelleLieferung(Lieferung aktuelleLieferung) {
+        this.aktuelleLieferung = aktuelleLieferung;
+    }
+
+    /**
+     * Berechnet die Einzelmenge mithilfe der Gesamtmenge und des Prozentsatzes
+     * @param Gesamtmenge Gesamtwert
+     * @param prozent Prozentsatz
+     * @return Prozentwert
+     */
     private int getEinzelmenge(int Gesamtmenge, double prozent) {
         return (int) (((double) Gesamtmenge / 100.0 * prozent) + 0.5);
     }
 
-    public double getSchrittweite(int Gesamtmenge) {
-        return 100.0 / (double) Gesamtmenge;
+    /**
+     * Berechnet die Schrittweite des Sliders
+     * @param gesamtmenge Gesamtmenge
+     * @return Die berechnete Schrittweite
+     */
+    public double getSchrittweite(int gesamtmenge) {
+        return 100.0 / (double) gesamtmenge;
     }
 
     public Stack<Buchung> getBuchungenUndoStack() {
@@ -215,15 +278,28 @@ public class Buchungsverwaltung {
         return lieferungenRedo;
     }
 
-    public boolean createLieferung(boolean Auslieferung, int gesamtmenge) {
+    /**
+     * Erstellt eine neue Lieferung, abhängig vom Radiobutton
+     * @param auslieferung true, wenn Auslieferung, false, wenn Zulieferung
+     * @param gesamtmenge Die Gesamtmenge der Lieferung
+     * @return True, wenn Lieferung erfolgreich eröffnet, false, wenn nicht
+     */
+    public boolean createLieferung(boolean auslieferung, int gesamtmenge) {
         verteilteMenge = 0;
-        if (Auslieferung)
+        if (auslieferung)
             return createAuslieferung(gesamtmenge);
         else
             return createZulieferung(gesamtmenge);
 
     }
 
+    /**
+     * Erstellt eine neue Buchung, abhängig vom Radiobutton
+     * @param auslieferung true, wenn Auslieferung, false, wenn Zulieferung
+     * @param lager Das Lager der Buchung
+     * @param prozent Der Prozentsatz der Buchung
+     * @return true, wenn Buchung erfolgreich erstellt, false wenn nicht
+     */
     public boolean createBuchung(boolean auslieferung, Lager lager, double prozent) {
         System.out.println(prozent);
         if (auslieferung)
@@ -240,10 +316,20 @@ public class Buchungsverwaltung {
         return verteilteMenge;
     }
 
+    /**
+     * Gibt zurück, ob zu dem gewählten Lager bereits eine Buchung in der aktuellen Lieferung existiert
+     * @param lager
+     * @return True, wenn Buchung existiert, false, wenn nicht
+     */
     public boolean istBearbeitet(Lager lager) {
         return buchungenUndo.contains(lager);
     }
 
+    /**
+     * Erstellt eine neue Verteilung, abhängig vom Radiobutton
+     * @param auslieferung True, wenn Auslieferung, false, wenn Zulieferung
+     * @return true, wenn Verteilung erfolgreich, False, wenn noch Restartikel vorhanden sind
+     */
     public boolean verteileLieferung(boolean auslieferung) {
         if (restMenge > 0)
             return false;
@@ -254,5 +340,8 @@ public class Buchungsverwaltung {
         return true;
     }
 
-
+    public void setHistorie(ArrayList<Lieferung> historie)
+    {
+    	this.historie = historie;
+    }
 }

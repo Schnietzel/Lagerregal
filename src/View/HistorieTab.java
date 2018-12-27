@@ -20,7 +20,7 @@ class HistorieTab extends JPanel {
         gt = ControllerSingleton.getGTInstance();
         this.setLayout(new BorderLayout());
 
-        DefaultListModel dlm = new DefaultListModel();
+        DefaultListModel<String> dlm = new DefaultListModel<String>();
         //gt.getLieferung(ControllerSingleton.getBVInstance().getHistorie(), dlm);
 
 
@@ -38,7 +38,7 @@ class HistorieTab extends JPanel {
         hList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JList hList = (JList) e.getSource();
+                JList<String> hList = (JList<String>) e.getSource();
                 if (e.getClickCount() == 2) {
                     int index = hList.locationToIndex(e.getPoint());
                 }

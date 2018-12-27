@@ -62,7 +62,7 @@ public class Lager implements Serializable {
      * Methode, um ein Unterlager zu entfernen
      * @param lager Das Unterlager, das entfernt werden soll.
      */
-	public void removerUnterlager(Lager lager) {
+	public void removeUnterlager(Lager lager) {
 		// TODO Auto-generated method stub
 		this.unterlager.remove(lager);
 	}

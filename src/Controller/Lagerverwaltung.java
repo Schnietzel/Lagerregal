@@ -12,41 +12,52 @@ import Model.Lieferung;
 import View.GUI;
 
 public class Lagerverwaltung {
-    private ArrayList<Lager> lager = new ArrayList<Lager>();
-
+    private Dateiverwaltung dv;			// Singleton-Instanz der Dateiverwaltung
+    private ArrayList<Lager> lager;		// Die Liste der Lager auf der Obersten Ebene
+    
+    /**
+     * Konstruktor, der alles wichtige initialisiert
+     */
     public Lagerverwaltung() {
+    	dv = ControllerSingleton.getDVInstance();
+    	
         ladeLager();
         updateLager();
     }
 
+    /**
+     * Lädt die bestehende Lager-Datei.
+     * Falls keine gefunden wird, wird das Testlager initialisiert
+     */
     private void ladeLager() {
-        // TODO: Datei festlegen, Exceptions und so
-        try {
-            String datei = "C:\\Test\\bla.lager";
-            File file = new File(datei);
-            lager = ControllerSingleton.getDVInstance().ladeLager(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-            lager = new ArrayList<Lager>();
+        File file = new File(".lager");
+        if (file.exists())
+        	lager = dv.ladeLager(file);
+        else
             initTestlager();
-        }
     }
 
+    /**
+     * Speichert die aktuelle Lagerkonfiguration in einer Datei
+     * Wird automatisch bei Programmende aufgerufen
+     */
     public void close() {
-        // TODO: Datei festlegen, Exceptions und so
-        try {
-            String datei = "C:\\Test\\bla.lager";
-            File file = new File(datei);
-            ControllerSingleton.getDVInstance().speicherLager(file, lager);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        File file = new File(".lager");
+        dv.speicherLager(file, lager);
     }
 
+    /**
+     * Getter für die aktuelle Lagerliste
+     * @return Die Liste der Oberlager
+     */
     public ArrayList<Lager> getLagerList() {
         return lager;
     }
 
+    /**
+     * Berechnet die Freie Lagerkapazität
+     * @return Die Freie Lagerkapazität
+     */
     public int getFreieGesamtlagerkapazität() {
         int kap = 0;
         for (Lager l : lager) {
@@ -55,6 +66,10 @@ public class Lagerverwaltung {
         return kap;
     }
 
+    /**
+     * Berechnet den Gesamtbestand
+     * @return Der Gesamtbestand
+     */
     public int getGesamtbestand() {
         int bestand = 0;
         for (Lager l : lager) {
@@ -63,22 +78,32 @@ public class Lagerverwaltung {
         return bestand;
     }
 
+    /**
+     * Führt für alle Oberlager das Rekursive Lagerupdate mit Ebene 0 durch
+     */
     public void updateLager() {
         for (Lager l : lager) {
             updateLagerRec(l, 0);
         }
     }
     
-    public void addLager() { //Lager auf Oberster Hierachie-Ebene hinzufügen
+    /**
+     * Fügt ein Lager auf der obersten Hierarchie-Ebene hinzu
+     */
+    public void addLager() { 
     	System.out.println("Lager hinzugefügt");
     	lager.add(new Lager("Neues Lager"));
     }
     
-    public void addLager(Lager l) { //Lager auf unter anderem Lager hinzufügen
+    /**
+     * Fügt ein Lager auf einer unteren Hierarchie-Ebene hinzu
+     * @param lager Das Lager, unter dem das neue Lager hinzugefügt wird
+     */
+    public void addLager(Lager lager) {
     	Lager found = null;
     	int tmpBestand = 0;
-    	System.out.println(l.getName());
-    	found = searchForName(l.getName(), this.lager, found);
+    	System.out.println(lager.getName());
+    	found = searchForName(lager.getName(), this.lager, found);
     	System.out.println("Found = "+ found);
     	
     	if(found.getUnterlager().isEmpty()&&found.getBestand()>0) {
@@ -104,7 +129,7 @@ public class Lagerverwaltung {
     			parent = searchForParent(l, this.lager , parent);
     			parent.setBestand(parent.getBestand()-tmpBestand);
     			parent.setKapazitaet(parent.getKapazitaet()-tmpKapazität);
-    			parent.removerUnterlager(l);
+    			parent.removeUnterlager(l);
     			removed = true;
     		}
     		else {
@@ -119,28 +144,33 @@ public class Lagerverwaltung {
     	return removed;
     }
 
-    private void updateLagerRec(Lager l, int depth) {
-        l.setEbene(depth);
+    /**
+     * Aktualisiert rekursiv die Ebene der Lager sowie den Bestand und die Kapazität
+     * @param lager das aktuelle Lager, welches aktualisiert wird
+     * @param depth die aktuelle Rekursionsiefe
+     */
+    private void updateLagerRec(Lager lager, int depth) {
+        lager.setEbene(depth);
         depth++;
-        for (Lager sub : l.getUnterlager()) {
+        for (Lager sub : lager.getUnterlager()) {
             updateLagerRec(sub, depth);
         }
 
-        if (!l.getUnterlager().isEmpty()) {
+        if (!lager.getUnterlager().isEmpty()) {
             int bestand = 0;
             int kap = 0;
-            for (Lager sub : l.getUnterlager()) {
+            for (Lager sub : lager.getUnterlager()) {
                 bestand += sub.getBestand();
                 kap += sub.getKapazitaet();
             }
-            l.setBestand(bestand);
-            l.setKapazitaet(kap);
+            lager.setBestand(bestand);
+            lager.setKapazitaet(kap);
         }
     }
     
     public Lager searchForName(String name, ArrayList<Lager> lagerList, Lager result) {
     	
-      	    	
+	    	
     	for(Lager l : lagerList) 
     	{
     		System.out.println(l.getName());
@@ -178,8 +208,17 @@ public class Lagerverwaltung {
     return result;
     	
     }
+    
+    public void setLagerListe(ArrayList<Lager> lager)
+    {
+    	this.lager = lager;
+    }
 
+    /**
+     * Initialisiert die Lagerliste mit Testlagern
+     */
     public void initTestlager() {
+    	lager = new ArrayList<Lager>();
         ArrayList<Lager> lNds = new ArrayList<Lager>();
         ArrayList<Lager> lDeutschland = new ArrayList<Lager>();
         ArrayList<Lager> lFrankreich = new ArrayList<Lager>();

@@ -52,7 +52,7 @@ public class GUITools {
 
     }
 
-    public void getLieferung(ArrayList<Lieferung> historie, DefaultListModel dlm) {
+    public void getLieferung(ArrayList<Lieferung> historie, DefaultListModel<String> dlm) {
         for (Lieferung l : historie) {
             dlm.addElement(l.toString());
             for (Buchung b : l.getBuchungen()) {
